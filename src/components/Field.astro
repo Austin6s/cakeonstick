@@ -9,15 +9,16 @@ interface Props {
   /** A number of rows makes this a textarea. */
   rows?: number;
   autocomplete?: string;
+  maxlength?: number;
 }
-const { label, name, type = 'text', placeholder, required = false, rows, autocomplete } = Astro.props;
+const { label, name, type = 'text', placeholder, required = false, rows, autocomplete, maxlength } = Astro.props;
 ---
 
 <label class="field">
   <span class="field-label">{label}{required && <span class="req" aria-hidden="true"> *</span>}</span>
   {
     rows ? (
-      <textarea name={name} placeholder={placeholder} rows={rows} required={required} />
+      <textarea name={name} placeholder={placeholder} rows={rows} required={required} maxlength={maxlength} />
     ) : (
       <input name={name} type={type} placeholder={placeholder} required={required} autocomplete={autocomplete} />
     )

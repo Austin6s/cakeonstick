@@ -12,15 +12,28 @@ export const homePath = (lang: Lang) => (lang === 'zh' ? base : `${base}en/`);
 export const assetPath = (file: string) => `${base}${file}`;
 export const absoluteUrl = (path: string) => new URL(path, import.meta.env.SITE).href;
 
+/** The number in a price such as "NT$3,999" or "NT$400 / set". */
+export function priceInTwd(price: string): number {
+  const digits = price.replace(/[^0-9]/g, '');
+  if (!digits) throw new Error(`No amount in the price "${price}"`);
+  return Number(digits);
+}
+
 const handle = settings.instagramHandle.replace(/^@/, '');
 export const links = {
   igHandle: `@${handle}`,
   igUrl: `https://instagram.com/${handle}`,
   igDmUrl: `https://ig.me/m/${handle}`,
   lineAddUrl: settings.lineAddUrl,
-  /** The same link without the https://line.me/R/ prefix, for opening the LINE app. */
-  lineAddPath: settings.lineAddUrl.replace('https://line.me/R/', ''),
-  lineMessagePath: (text: string) =>
-    `oaMessage/${encodeURIComponent(settings.lineId)}/?${encodeURIComponent(text)}`,
+  /**
+   * Opens a LINE chat with the account and `text` typed in, ready to send. LINE only
+   * honours this on phones and tablets; on a computer it redirects to LINE's home page,
+   * so the page copies the message and opens the add-friend link there instead.
+   */
+  lineMessageUrl: (text: string) =>
+    `https://line.me/R/oaMessage/${settings.lineId}/?${encodeURIComponent(text)}`,
   mailto: `mailto:${settings.contactEmail}`,
+  /** Opens the visitor's default mail app with the subject and body filled in. */
+  mailtoWith: (subject: string, body: string) =>
+    `mailto:${settings.contactEmail}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`,
 };

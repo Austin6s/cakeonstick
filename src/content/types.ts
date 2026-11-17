@@ -60,6 +60,8 @@ export interface NutritionPanel {
 export interface Strings {
   metaTitle: string;
   metaDescription: string;
+  ogImageAlt: string;
+  mainNavLabel: string;
   skipToContent: string;
   navShop: string;
   navStory: string;
@@ -127,8 +129,14 @@ export interface Strings {
   formSendEmail: string;
   formError: string;
   formSuccessLine: string;
+  formSuccessLineCopied: string;
   formSuccessIg: string;
   formSuccessEmail: string;
+  formEmailFallback: string;
+  formBlocked: string;
+  formOpenLine: string;
+  formOpenIg: string;
+  formOpenEmail: string;
   formSubjectPrefix: string;
   formNameLine: string;
   formDateLine: string;
@@ -146,7 +154,11 @@ export interface Strings {
   orderMsgLabel: string;
   orderLineCta: string;
   orderIgCta: string;
+  orderEmailCta: string;
+  orderEmailSubject: string;
   orderIgCopied: string;
+  orderLineCopied: string;
+  copyFailed: string;
   orderCancel: string;
   copyBtn: string;
   copiedBtn: string;

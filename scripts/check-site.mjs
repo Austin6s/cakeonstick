@@ -41,11 +41,14 @@ for (const page of pages) {
   need(/<title>[^<]+<\/title>/, 'no title');
   need(/<meta name="description" content="[^"]+"/, 'no description');
   need(/<link rel="canonical" href="https?:\/\/[^"]+"/, 'no canonical link');
-  for (const hreflang of ['zh-Hant-TW', 'en', 'x-default']) {
+  for (const hreflang of ['zh-TW', 'en', 'x-default']) {
     need(new RegExp(`<link rel="alternate" hreflang="${hreflang}" href="[^"]+"`), `no hreflang ${hreflang}`);
   }
   need(/<meta property="og:image" content="[^"]+"/, 'no Open Graph image');
   need(/application\/ld\+json/, 'no structured data');
+  for (const type of ['Bakery', 'WebSite', 'FAQPage']) {
+    need(new RegExp(`"@type":"${type}"`), `structured data has no ${type}`);
+  }
   need(/id="nutrition"/, 'the #nutrition anchor is gone');
   need(/rel="preload" as="image"/, 'the hero photo is not preloaded');
 

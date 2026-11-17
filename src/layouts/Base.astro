@@ -9,33 +9,92 @@ import '@fontsource/poppins/latin-600.css';
 import '@fontsource/poppins/latin-700.css';
 import '../styles/tokens.css';
 import '../styles/site.css';
+import { getImage } from 'astro:assets';
 import hero from '../assets/photos/drizzle-trio-coral-bg.png';
 import { content, settings } from '../content';
+import { photos } from '../content/photos';
 import type { Lang } from '../content/types';
 import { HERO, responsiveSources } from '../lib/images';
-import { absoluteUrl, assetPath, buildInfo, homePath, isProduction, links } from '../lib/site';
+import { absoluteUrl, assetPath, buildInfo, homePath, isProduction, links, priceInTwd } from '../lib/site';
 
 interface Props {
   lang: Lang;
 }
 const { lang } = Astro.props;
-const { htmlLang, strings: t } = content[lang];
+const site = content[lang];
+const { htmlLang, strings: t } = site;
 const canonical = absoluteUrl(homePath(lang));
+const home = absoluteUrl(homePath('zh'));
 const ogImage = absoluteUrl(assetPath('og.jpg'));
 const heroSources = await responsiveSources(hero, HERO.widths, HERO.quality);
 
+// What search engines read about the business: who it is, what it sells and for how
+// much, and the FAQ. Built from the same content files as the page, so it can't drift.
+const offers = settings.showPrices
+  ? await Promise.all(
+      site.products.map(async (p) => {
+        const photo = photos[p.id]?.[0];
+        const image = photo && (await getImage({ src: photo, width: Math.min(800, photo.width), format: 'webp' }));
+        return {
+          '@type': 'Offer',
+          price: priceInTwd(p.price),
+          priceCurrency: 'TWD',
+          availability: 'https://schema.org/MadeToOrder',
+          url: `${canonical}#shop`,
+          itemOffered: {
+            '@type': 'Product',
+            name: p.name,
+            description: p.flavors.map((f) => `${f.name}: ${f.desc}`).join('; '),
+            ...(image ? { image: absoluteUrl(image.src) } : {}),
+          },
+        };
+      }),
+    )
+  : [];
+const prices = [...offers.map((o) => o.price), ...Object.values(settings.packagePrices).map(priceInTwd)];
+const formatTwd = (n: number) => `NT$${n.toLocaleString('en')}`;
 const structuredData = {
   '@context': 'https://schema.org',
-  '@type': 'Bakery',
-  name: 'Cake on Stick',
-  description: t.metaDescription,
-  url: canonical,
-  image: ogImage,
-  logo: absoluteUrl(assetPath('apple-touch-icon.png')),
-  email: settings.contactEmail,
-  address: { '@type': 'PostalAddress', addressCountry: 'TW' },
-  areaServed: { '@type': 'Country', name: 'Taiwan' },
-  sameAs: [links.igUrl],
+  '@graph': [
+    {
+      '@type': 'WebSite',
+      '@id': `${home}#website`,
+      url: home,
+      name: 'Cake on Stick',
+      inLanguage: ['zh-Hant-TW', 'en'],
+      publisher: { '@id': `${home}#business` },
+    },
+    {
+      '@type': 'Bakery',
+      '@id': `${home}#business`,
+      name: 'Cake on Stick',
+      description: t.metaDescription,
+      url: home,
+      image: ogImage,
+      logo: absoluteUrl(assetPath('apple-touch-icon.png')),
+      email: settings.contactEmail,
+      address: { '@type': 'PostalAddress', addressCountry: 'TW' },
+      areaServed: { '@type': 'Country', name: 'Taiwan' },
+      currenciesAccepted: 'TWD',
+      sameAs: [links.igUrl],
+      ...(offers.length
+        ? {
+            priceRange: `${formatTwd(Math.min(...prices))}–${formatTwd(Math.max(...prices))}`,
+            hasOfferCatalog: { '@type': 'OfferCatalog', name: t.shopTitle, itemListElement: offers },
+          }
+        : {}),
+    },
+    {
+      '@type': 'FAQPage',
+      '@id': `${canonical}#faq`,
+      inLanguage: htmlLang,
+      mainEntity: site.faqs.map((f) => ({
+        '@type': 'Question',
+        name: f.q,
+        acceptedAnswer: { '@type': 'Answer', text: f.a },
+      })),
+    },
+  ],
 };
 ---
 
@@ -49,7 +108,7 @@ const structuredData = {
     <meta name="description" content={t.metaDescription} />
     {!isProduction && <meta name="robots" content="noindex, nofollow" />}
     <link rel="canonical" href={canonical} />
-    <link rel="alternate" hreflang="zh-Hant-TW" href={absoluteUrl(homePath('zh'))} />
+    <link rel="alternate" hreflang="zh-TW" href={absoluteUrl(homePath('zh'))} />
     <link rel="alternate" hreflang="en" href={absoluteUrl(homePath('en'))} />
     <link rel="alternate" hreflang="x-default" href={absoluteUrl(homePath('zh'))} />
     <link rel="icon" type="image/png" sizes="48x48" href={assetPath('favicon.png')} />
@@ -65,6 +124,7 @@ const structuredData = {
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={t.ogImageAlt} />
     <meta property="og:locale" content={lang === 'zh' ? 'zh_TW' : 'en_US'} />
     <meta property="og:locale:alternate" content={lang === 'zh' ? 'en_US' : 'zh_TW'} />
     <meta name="twitter:card" content="summary_large_image" />

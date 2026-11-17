@@ -3,6 +3,14 @@
  * The quick-order dialog for one gift set or party package. A native <dialog>:
  * the browser moves focus in, keeps it inside, closes on Esc and returns focus
  * to the button that opened it.
+ *
+ * The three ways to order are real links, so no pop-up blocker can stop them:
+ *  - LINE: on a phone the chat opens with the message typed in. LINE does not do that
+ *    on a computer, so there the message is copied and the add-friend page opens
+ *    (src/scripts/site.ts switches the link).
+ *  - Instagram: a DM can't be pre-filled, so the message is copied and the DM opens.
+ *  - Email: the visitor's default mail app opens with the subject and message filled in.
+ * The message and a Copy button are always shown, in case an app does not open.
  */
 import type { ImageMetadata } from 'astro';
 import type { Flavor, Strings } from '../content/types';
@@ -19,7 +27,6 @@ interface Props {
   t: Strings;
 }
 const { id, name, priceDisplay, photo, flavors = [], message, t } = Astro.props;
-const linePath = links.lineMessagePath(message);
 ---
 
 <dialog class="order" id={`order-${id}`} aria-labelledby={`order-${id}-title`} data-message={message}>
@@ -66,14 +73,25 @@ const linePath = links.lineMessagePath(message);
         <p class="order-message">{message}</p>
       </div>
       <div class="order-actions">
-        <a class="order-line" href={`https://line.me/R/${linePath}`} target="_blank" rel="noopener" data-line={linePath}>
+        <a
+          class="order-line"
+          href={links.lineMessageUrl(message)}
+          target="_blank"
+          rel="noopener"
+          data-line-message
+          data-add-url={links.lineAddUrl}
+          data-copied={t.orderLineCopied}
+        >
           {t.orderLineCta}
         </a>
-        <a class="order-ig" href={links.igDmUrl} target="_blank" rel="noopener" data-order-ig>
+        <a class="order-ig" href={links.igDmUrl} target="_blank" rel="noopener" data-copy-first data-copied={t.orderIgCopied}>
           {t.orderIgCta}
         </a>
+        <a class="order-ig" href={links.mailtoWith(t.orderEmailSubject + name, message)} data-order-email>
+          {t.orderEmailCta}
+        </a>
       </div>
-      <p class="order-copied" role="status" data-copied data-text={t.orderIgCopied}></p>
+      <p class="order-copied" role="status" data-status data-copy-failed={t.copyFailed}></p>
       <button class="order-cancel" type="button" data-close>{t.orderCancel}</button>
     </div>
   </div>

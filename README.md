@@ -34,7 +34,10 @@ npm run dev        # local site with live reload, at http://localhost:4321/
 npm run check      # everything CI runs: type check, build, site check, browser tests
 ```
 
-`npm run check` needs the test browser once: `npx playwright install chromium`.
+`npm run check` needs the test browsers once: `npx playwright install chromium firefox`.
+It tests in Chrome's and Firefox's engines. Safari's engine (iPhones, Macs) needs system
+libraries most machines lack, so it runs in CI, or locally in a container with
+`npm run test:webkit` (needs Docker and a built `dist/`).
 
 ## How a change goes live
 
@@ -53,10 +56,13 @@ The checks that must pass before anything is published:
   tags; the dev build is noindex and production is not; **nothing loads from another
   host** and every URL in the output is on a short known list. This is the repo's
   "no Chinese servers" guard (see `CLAUDE.md`).
-- `tests/site.spec.ts` (Playwright): no sideways scrolling at 360, 768, 1280 and 1440 px;
-  the header breakpoint; the quick-order dialog (focus, Esc, backdrop, LINE link,
-  Instagram copy); carousels; the contact form; the language redirect and memory; the
-  `#nutrition` link; and that the page renders with JavaScript off.
+- `tests/site.spec.ts` (Playwright, in the Chrome, Firefox and Safari engines): no sideways
+  scrolling at 360, 768, 1280 and 1440 px; the header breakpoint; the quick-order dialog
+  (focus, Esc, backdrop); every way to order and to send the form (LINE on a phone, LINE on
+  a computer, Instagram, email, a blocked pop-up, the Copy button); carousels; the
+  language rule and memory; the `#nutrition` link; and that the page renders with
+  JavaScript off. The tests never contact LINE, Instagram or a mail server: they check
+  the links and what gets copied.
 
 ### The domain
 
@@ -85,9 +91,22 @@ The address is set in `astro.config.mjs` and the workflow; the repository variab
 - Fonts: Poppins and Inter are served from the site itself. Chinese text uses the Chinese
   font already on the visitor's device (downloading Noto Sans TC cost about 1.2 MB).
 - The quick-order dialog is a native `<dialog>`.
-- The contact form sends nothing to a server. It writes the message and opens LINE
-  (pre-filled), the visitor's mail app (pre-filled) or the Instagram DM (the message is
-  copied to paste in, because Instagram cannot be pre-filled).
+- Ordering and the contact form send nothing to a server. They write the message and
+  hand it to an app, by the same rules in both places (`src/scripts/site.ts`):
+
+  | Channel | What happens |
+  |---|---|
+  | LINE on a phone or tablet | The chat with the account opens with the message typed in. |
+  | LINE on a computer | LINE does not accept a typed-in message there (its link just goes to LINE's home page), so the message is copied and the add-friend page with the QR code opens. |
+  | Instagram | A DM cannot be pre-filled, so the message is copied and the DM opens. |
+  | Email | The visitor's default mail app opens with the subject and message filled in (`mailto:`). |
+
+  The message is always shown with a Copy button. After the form is sent it also shows a
+  direct link, and says so if the browser blocked the new tab, so the visitor can still
+  send it when an app does not open (a pop-up blocker, no mail app, an in-app browser).
+- Search engines: each language has its own title and description, `hreflang` links, a
+  sitemap, and structured data (the business, the seven sets with prices, the FAQ) built
+  from the content files.
 
 `cake-on-stick-handoff/` is the original design handoff (the prototype, design system and
 source images). It is kept for reference and is not part of the build.
@@ -105,3 +124,9 @@ source images). It is kept for reference and is not part of the build.
 4. **Card photo shape.** Cards show a 4:3 window of 4:5 photos, as designed. The current
    photos have enough margin that nothing is cut off.
 5. **Analytics.** None is installed.
+6. **A real-phone test.** Ordering by LINE, Instagram and email is tested in three browser
+   engines, but not with the real apps. Try each once on an iPhone and an Android phone,
+   including from inside Instagram's own browser (the link in the bio opens there).
+7. **Google Search Console.** Not set up (it needs the owner's Google login). Google will
+   find the site on its own; adding the site there and submitting
+   `https://cakeonstick.com/sitemap.xml` makes it faster and shows how it is doing.

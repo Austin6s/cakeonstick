@@ -13,6 +13,7 @@
     "typecheck": "ASTRO_TELEMETRY_DISABLED=1 astro check",
     "check:site": "node scripts/check-site.mjs",
     "test:e2e": "playwright test",
+    "test:webkit": "docker run --rm --ipc=host --user $(id -u):$(id -g) -e HOME=/tmp -e WEBKIT=1 -v \"$PWD\":/work -w /work mcr.microsoft.com/playwright:v$(node -p \"require('@playwright/test/package.json').version\")-noble npx playwright test --project=webkit",
     "check": "npm run typecheck && npm run build && npm run check:site && npm run test:e2e"
   },
   "dependencies": {

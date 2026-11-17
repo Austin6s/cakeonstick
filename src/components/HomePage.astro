@@ -51,11 +51,12 @@ const packageRows = [
   { label: t.pkgSize21, value: price(settings.packagePrices.p21) },
   { label: t.pkgSize30, value: price(settings.packagePrices.p30) },
 ];
+const nameOf = (id: string) => site.products.find((p) => p.id === id)?.name ?? 'Cake on Stick';
 const followTiles = [
-  { src: hero, alt: 'Cake on Stick cakesicles' },
-  { src: loveSet, alt: "Valentine's Collection cakesicles" },
-  { src: babyGirl, alt: 'Baby Girl Gift Set cakesicles' },
-  { src: babyBoy, alt: 'Baby Boy Gift Set cakesicles' },
+  { src: hero, alt: t.ogImageAlt },
+  { src: loveSet, alt: nameOf('set-love') },
+  { src: babyGirl, alt: nameOf('set-baby-girl') },
+  { src: babyBoy, alt: nameOf('set-baby-boy') },
 ];
 ---
 
@@ -77,7 +78,7 @@ const followTiles = [
           <div class="hero-ctas">
             <Button variant="primary" size="lg" href="#contact">{t.heroCtaPrimary}</Button>
             <Button variant="secondary" size="lg" onDark href={links.igUrl} newTab>{t.heroCtaSecondary}</Button>
-            <a class="btn-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line={links.lineAddPath}>{t.followLineCta}</a>
+            <a class="btn-line" href={links.lineAddUrl} target="_blank" rel="noopener">{t.followLineCta}</a>
           </div>
           <p class="hero-note">{t.heroNote}</p>
         </div>
@@ -219,7 +220,7 @@ const followTiles = [
         </div>
         <div class="follow-ctas">
           <Button variant="primary" size="lg" href={links.igUrl} newTab>{t.followCta}</Button>
-          <a class="btn-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line={links.lineAddPath}>{t.followLineCta}</a>
+          <a class="btn-line" href={links.lineAddUrl} target="_blank" rel="noopener">{t.followLineCta}</a>
         </div>
       </div>
     </section>
@@ -251,21 +252,24 @@ const followTiles = [
           <p class="contact-p is-strong">{t.contactChannels}</p>
           <div class="contact-channels">
             <a class="channel is-ig" href={links.igUrl} target="_blank" rel="noopener">{t.contactIgBtn}</a>
-            <a class="channel is-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line={links.lineAddPath}>{t.contactLineBtn}</a>
+            <a class="channel is-line" href={links.lineAddUrl} target="_blank" rel="noopener">{t.contactLineBtn}</a>
             <a class="channel is-email" href={links.mailto}>{t.contactEmailBtn}</a>
           </div>
           <p class="contact-p is-last">{t.contactP3}</p>
         </div>
-        <!-- The form sends nothing to a server: it writes the message and hands it to LINE
-             (pre-filled), Instagram (copied, then the DM opens: Instagram can't be pre-filled)
-             or the visitor's mail app (pre-filled). Without JavaScript it falls back to mail. -->
+        <!-- The form sends nothing to a server. It writes the message, opens the chosen app
+             with it, and then always shows the message with a Copy button and a direct link,
+             so the visitor can still send it if the app did not open (a pop-up blocker, no
+             mail app, an in-app browser). How each app is opened is in src/scripts/site.ts.
+             Without JavaScript the form falls back to the visitor's mail app. -->
         <form
           class="contact-form"
           action={links.mailto}
           method="post"
           enctype="text/plain"
           data-contact-form
-          data-line-id={settings.lineId}
+          data-line-message-url={links.lineMessageUrl('')}
+          data-line-add-url={links.lineAddUrl}
           data-email={settings.contactEmail}
           data-ig-url={links.igDmUrl}
           data-subject-prefix={t.formSubjectPrefix}
@@ -273,20 +277,38 @@ const followTiles = [
           data-date-line={t.formDateLine}
           data-no-details={t.formNoDetails}
           data-success-line={t.formSuccessLine}
+          data-success-line-copied={t.formSuccessLineCopied}
           data-success-ig={t.formSuccessIg}
-          data-success-email={t.formSuccessEmail}
+          data-success-email={`${t.formSuccessEmail} ${t.formEmailFallback.replace('{email}', settings.contactEmail)}`}
+          data-blocked={t.formBlocked}
+          data-copy-failed={t.copyFailed}
+          data-open-line={t.formOpenLine}
+          data-open-ig={t.formOpenIg}
+          data-open-email={t.formOpenEmail}
         >
           <Field label={t.formName} name="name" placeholder={t.formNamePh} required autocomplete="name" />
           <Field label="Email" name="email" type="email" placeholder="jane@email.com" required autocomplete="email" />
           <Field label={t.formDate} name="date" type="date" />
-          <Field label={t.formMessage} name="message" placeholder={t.formMessagePh} rows={4} />
+          <Field label={t.formMessage} name="message" placeholder={t.formMessagePh} rows={4} maxlength={1000} />
           <div class="form-actions">
             <button class="btn-line" type="submit" data-via="line">{t.formSendLine}</button>
             <Button variant="primary" size="lg" type="submit" data-via="instagram">{t.formSendIg}</Button>
             <button class="btn-outline" type="submit" data-via="email">{t.formSendEmail}</button>
           </div>
           <p class="form-status is-error" role="alert" data-form-error hidden>{t.formError}</p>
-          <p class="form-status is-success" role="status" data-form-success hidden></p>
+          <div class="form-result" data-form-result hidden>
+            <p class="form-status is-success" role="status" data-form-success></p>
+            <div>
+              <div class="order-msg-head">
+                <p class="order-label">{t.orderMsgLabel}</p>
+                <button class="order-copy" type="button" data-form-copy data-label={t.copyBtn} data-label-done={t.copiedBtn}>
+                  {t.copyBtn}
+                </button>
+              </div>
+              <p class="order-message is-on-tint" data-form-message></p>
+            </div>
+            <a class="form-open" href={links.mailto} rel="noopener" data-form-open>{t.formOpenEmail}</a>
+          </div>
         </form>
       </div>
     </section>

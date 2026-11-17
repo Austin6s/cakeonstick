@@ -1,8 +1,89 @@
 // Everything the page does in the browser. The page reads fine without it; this adds
-// the language memory, the menu, LINE/Instagram ordering, the dialog, carousels and the form.
+// the language memory, the menu, ordering by LINE / Instagram / email, the dialog,
+// carousels and the contact form.
+//
+// How a message reaches each app (the same rules for quick order and the contact form):
+//   LINE on a phone     the chat opens with the message typed in (line.me/R/oaMessage).
+//   LINE on a computer  LINE ignores that link there, so the message is copied and the
+//                       add-friend page (a QR code) opens.
+//   Instagram           a DM can't be pre-filled: the message is copied and the DM opens.
+//   Email               mailto: opens the visitor's default mail app, pre-filled.
+// The message is always shown with a Copy button, so nothing is lost if an app or a new
+// tab does not open.
 
 const all = <T extends Element>(selector: string, root: ParentNode = document) =>
   Array.from(root.querySelectorAll<T>(selector));
+
+/** Phones and tablets, where LINE opens a chat with the message typed in. */
+const isPhone =
+  /Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ||
+  // iPadOS calls itself a Mac; a Mac with a touch screen is an iPad.
+  (/Macintosh/i.test(navigator.userAgent) && navigator.maxTouchPoints > 1);
+
+/**
+ * Copies `text`. The copy itself happens straight away, inside the tap, so it still
+ * works when a new tab is opened on the next line. Resolves to whether it worked.
+ * `near` must be inside the open dialog when there is one: the rest of the page is
+ * inert while a dialog is open.
+ *
+ * It uses document.execCommand('copy'), which is marked deprecated, on purpose: it is
+ * the only copy that finishes before the next line runs. navigator.clipboard is
+ * asynchronous and fails once the new tab has taken the focus, so it is only the fallback.
+ */
+function copyText(text: string, near: HTMLElement = document.body): Promise<boolean> {
+  const focused = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+  const box = document.createElement('textarea');
+  box.value = text;
+  box.readOnly = true;
+  box.setAttribute('aria-hidden', 'true');
+  // 16px stops iOS zooming in on it; fixed and transparent keeps the page still.
+  box.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;padding:0;border:0;opacity:0;font-size:16px;';
+  near.appendChild(box);
+  box.focus({ preventScroll: true });
+  box.select();
+  box.setSelectionRange(0, text.length);
+  let ok = false;
+  try {
+    ok = document.execCommand('copy');
+  } catch {
+    ok = false;
+  }
+  box.remove();
+  focused?.focus({ preventScroll: true });
+  if (ok) return Promise.resolve(true);
+  if (!navigator.clipboard) return Promise.resolve(false);
+  return navigator.clipboard.writeText(text).then(
+    () => true,
+    () => false,
+  );
+}
+
+/** Opens `url` in a new tab. False when a pop-up blocker stopped it. */
+function openTab(url: string): boolean {
+  const tab = window.open(url, '_blank');
+  if (!tab) return false;
+  try {
+    tab.opener = null; // the new page gets no handle on this one
+  } catch {
+    // Already on another site: nothing to do.
+  }
+  return true;
+}
+
+/** A Copy button: copies, shows "Copied" for two seconds, or says it could not. */
+function wireCopyButton(button: HTMLButtonElement, getText: () => string, near: HTMLElement, onFail: () => void) {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  button.addEventListener('click', () => {
+    void copyText(getText(), near).then((ok) => {
+      if (!ok) return onFail();
+      button.textContent = button.dataset.labelDone ?? '';
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        button.textContent = button.dataset.label ?? '';
+      }, 2000);
+    });
+  });
+}
 
 // ---------- Language: remember the visitor's choice, keep their place on the page ----------
 for (const link of all<HTMLAnchorElement>('[data-lang]')) {
@@ -15,26 +96,6 @@ for (const link of all<HTMLAnchorElement>('[data-lang]')) {
     link.href = link.href.split('#')[0] + location.hash;
   });
 }
-
-// ---------- LINE ----------
-const isMobileDevice = () => /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-/** Opens LINE at `path` (for example "ti/p/@id" or "oaMessage/@id/?text"). */
-function openLineUri(path: string) {
-  if (isMobileDevice()) {
-    window.open('https://line.me/R/' + path, '_blank', 'noopener');
-    return;
-  }
-  // Desktop: try the LINE desktop app first, fall back to the web link.
-  window.location.href = 'line://' + path;
-  setTimeout(() => {
-    if (!document.hidden) window.open('https://line.me/R/' + path, '_blank', 'noopener');
-  }, 1500);
-}
-
-const copyText = (text: string) => {
-  navigator.clipboard?.writeText(text).catch(() => {});
-};
 
 // ---------- Mobile menu ----------
 const menuButton = document.querySelector<HTMLButtonElement>('[data-menu-button]');
@@ -58,55 +119,47 @@ window.addEventListener('keydown', (event) => {
   }
 });
 
-// ---------- Clicks handled anywhere on the page ----------
+// ---------- Opening a quick-order dialog ----------
 document.addEventListener('click', (event) => {
-  const target = event.target as Element;
-
-  const line = target.closest<HTMLElement>('[data-line]');
-  if (line?.dataset.line) {
-    event.preventDefault();
-    openLineUri(line.dataset.line);
-    return;
-  }
-
-  const opener = target.closest<HTMLElement>('[data-order], [data-order-media]');
+  const opener = (event.target as Element).closest<HTMLElement>('[data-order], [data-order-media]');
   const orderId = opener?.dataset.order ?? opener?.dataset.orderMedia;
-  if (orderId) {
-    const dialog = document.getElementById('order-' + orderId);
-    if (dialog instanceof HTMLDialogElement && !dialog.open) dialog.showModal();
-  }
+  if (!orderId) return;
+  const dialog = document.getElementById('order-' + orderId);
+  if (dialog instanceof HTMLDialogElement && !dialog.open) dialog.showModal();
 });
 
 // ---------- Quick-order dialogs ----------
 for (const dialog of all<HTMLDialogElement>('dialog.order')) {
   const message = dialog.dataset.message ?? '';
-  const copied = dialog.querySelector<HTMLElement>('[data-copied]');
-  const copyButton = dialog.querySelector<HTMLButtonElement>('[data-copy]');
-  let copyTimer: ReturnType<typeof setTimeout> | undefined;
+  const status = dialog.querySelector<HTMLElement>('[data-status]');
+  const say = (text: string | undefined) => {
+    if (status) status.textContent = text ?? '';
+  };
+  const sayCopyFailed = () => say(status?.dataset.copyFailed);
 
   // A click on the backdrop lands on the dialog element itself.
   dialog.addEventListener('click', (event) => {
     if (event.target === dialog) dialog.close();
   });
   dialog.querySelector('[data-close]')?.addEventListener('click', () => dialog.close());
-  dialog.addEventListener('close', () => {
-    if (copied) copied.textContent = '';
-  });
+  dialog.addEventListener('close', () => say(''));
 
-  copyButton?.addEventListener('click', () => {
-    copyText(message);
-    copyButton.textContent = copyButton.dataset.labelDone ?? '';
-    clearTimeout(copyTimer);
-    copyTimer = setTimeout(() => {
-      copyButton.textContent = copyButton.dataset.label ?? '';
-    }, 2000);
-  });
+  const copyButton = dialog.querySelector<HTMLButtonElement>('[data-copy]');
+  if (copyButton) wireCopyButton(copyButton, () => message, dialog, sayCopyFailed);
 
-  // Instagram can't be pre-filled: copy the message, then the link opens the DM.
-  dialog.querySelector('[data-order-ig]')?.addEventListener('click', () => {
-    copyText(message);
-    if (copied) copied.textContent = copied.dataset.text ?? '';
-  });
+  // On a computer LINE can't take a typed-in message: copy it and open the add-friend page.
+  const lineLink = dialog.querySelector<HTMLAnchorElement>('[data-line-message]');
+  if (lineLink && !isPhone) {
+    lineLink.href = lineLink.dataset.addUrl ?? lineLink.href;
+    lineLink.setAttribute('data-copy-first', '');
+  }
+
+  // "Copy first" links copy the message as they open (Instagram always, LINE on a computer).
+  for (const link of all<HTMLAnchorElement>('[data-copy-first]', dialog)) {
+    link.addEventListener('click', () => {
+      void copyText(message, dialog).then((ok) => (ok ? say(link.dataset.copied) : sayCopyFailed()));
+    });
+  }
 }
 
 // ---------- Photo carousels ----------
@@ -131,26 +184,52 @@ for (const media of all<HTMLElement>('[data-carousel]')) {
   );
 }
 
-// ---------- Contact form: write the message, hand it to LINE, Instagram or the mail app ----------
+// ---------- Contact form ----------
 const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
 if (form) {
-  const errorEl = form.querySelector<HTMLElement>('[data-form-error]');
-  const successEl = form.querySelector<HTMLElement>('[data-form-success]');
   const d = form.dataset;
+  const errorEl = form.querySelector<HTMLElement>('[data-form-error]');
+  const result = form.querySelector<HTMLElement>('[data-form-result]');
+  const statusEl = form.querySelector<HTMLElement>('[data-form-success]');
+  const messageEl = form.querySelector<HTMLElement>('[data-form-message]');
+  const openLink = form.querySelector<HTMLAnchorElement>('[data-form-open]');
+  const copyButton = form.querySelector<HTMLButtonElement>('[data-form-copy]');
+  const input = (name: string) => form.querySelector<HTMLInputElement | HTMLTextAreaElement>(`[name="${name}"]`);
+  const emailPattern = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
+  let text = '';
+
   form.noValidate = true; // the page shows its own message instead of the browser's bubbles
+
+  // The event date can't be in the past.
+  const dateInput = input('date');
+  if (dateInput) {
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    dateInput.setAttribute('min', `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`);
+  }
+
+  if (copyButton && statusEl) {
+    wireCopyButton(copyButton, () => text, form, () => {
+      statusEl.textContent = d.copyFailed ?? '';
+    });
+  }
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    const data = new FormData(form);
-    const field = (name: string) => String(data.get(name) ?? '').trim();
-    const name = field('name');
-    const email = field('email');
-    const date = field('date');
-    const message = field('message');
+    const value = (name: string) => (input(name)?.value ?? '').trim();
+    const name = value('name');
+    const email = value('email');
+    const date = value('date');
+    const message = value('message');
 
-    if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+    const nameOk = name !== '';
+    const emailOk = emailPattern.test(email);
+    input('name')?.setAttribute('aria-invalid', String(!nameOk));
+    input('email')?.setAttribute('aria-invalid', String(!emailOk));
+    if (!nameOk || !emailOk) {
       if (errorEl) errorEl.hidden = false;
-      if (successEl) successEl.hidden = true;
+      if (result) result.hidden = true;
+      input(nameOk ? 'email' : 'name')?.focus();
       return;
     }
 
@@ -159,26 +238,55 @@ if (form) {
     if (date) lines.push((d.dateLine ?? '') + date);
     lines.push('', message || (d.noDetails ?? ''));
     const body = lines.join('\n');
+    // In a chat the heading is just "Custom order request"; the name is on the next line.
+    text = (d.subjectPrefix ?? '').replace(/[\s—-]+$/, '') + '\n' + body;
 
+    // Where to go, whether the message has to be copied first, and what to say.
     const via = (event.submitter as HTMLElement | null)?.dataset.via ?? 'line';
+    let url: string;
+    let copyFirst = false;
+    let success: string | undefined;
+    let openLabel: string | undefined;
     if (via === 'email') {
-      window.location.href =
-        'mailto:' + (d.email ?? '') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      url = 'mailto:' + (d.email ?? '') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+      success = d.successEmail;
+      openLabel = d.openEmail;
     } else if (via === 'instagram') {
-      // Instagram can't be pre-filled: copy the message, then open the DM.
-      copyText(subject + '\n' + body);
-      window.open(d.igUrl ?? '', '_blank', 'noopener');
+      url = d.igUrl ?? '';
+      copyFirst = true;
+      success = d.successIg;
+      openLabel = d.openIg;
+    } else if (isPhone) {
+      url = (d.lineMessageUrl ?? '') + encodeURIComponent(text);
+      success = d.successLine;
+      openLabel = d.openLine;
     } else {
-      openLineUri(
-        'oaMessage/' + encodeURIComponent(d.lineId ?? '') + '/?' + encodeURIComponent(subject + '\n' + body),
-      );
+      url = d.lineAddUrl ?? '';
+      copyFirst = true;
+      success = d.successLineCopied;
+      openLabel = d.openLine;
     }
+
+    // Copy first (while this page still has the focus), then open the app.
+    const copied = copyFirst ? copyText(text, form) : Promise.resolve(true);
+    let opened = true;
+    if (via === 'email') window.location.href = url;
+    else opened = openTab(url);
 
     if (errorEl) errorEl.hidden = true;
-    if (successEl) {
-      successEl.textContent =
-        (via === 'email' ? d.successEmail : via === 'instagram' ? d.successIg : d.successLine) ?? '';
-      successEl.hidden = false;
+    if (messageEl) messageEl.textContent = text;
+    if (openLink) {
+      openLink.href = url;
+      openLink.textContent = openLabel ?? '';
+      // A mail link stays in this tab; the others open a new one.
+      if (via === 'email') openLink.removeAttribute('target');
+      else openLink.target = '_blank';
     }
+    void copied.then((ok) => {
+      // Blocked: say so and point at the link below, rather than "it should have opened".
+      const parts = opened ? [ok ? success : d.copyFailed] : [d.blocked, ok ? undefined : d.copyFailed];
+      if (statusEl) statusEl.textContent = parts.filter(Boolean).join(' ');
+      if (result) result.hidden = false;
+    });
   });
 }

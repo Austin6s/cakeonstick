@@ -5,8 +5,11 @@ export const en: SiteContent = {
   lang: 'en',
   htmlLang: 'en',
   strings: {
-    metaTitle: 'Cake on Stick — Handmade Cakesicles',
-    metaDescription: 'Handmade cakesicles, custom party packages. Order by Instagram DM.',
+    metaTitle: 'Cake on Stick | Handmade Cakesicles in Taiwan — Gift Sets & Party Packages',
+    metaDescription:
+      'Handmade cakesicles made to order in Taiwan: gift sets and themed party packages for birthdays, baby showers, weddings and gender reveals. Shipped cold anywhere in Taiwan. Order on LINE or Instagram.',
+    ogImageAlt: 'Cake on Stick handmade cakesicles',
+    mainNavLabel: 'Main',
     skipToContent: 'Skip to content',
     navShop: 'Shop',
     navStory: 'Our Story',
@@ -80,10 +83,17 @@ export const en: SiteContent = {
     formError: 'Please add your name and a valid email so we can reply.',
     formSuccessLine:
       "Thanks! LINE should have opened with your request — just hit send, and we'll be in touch within 1–2 days.",
+    formSuccessLineCopied:
+      "Thanks! Your request is copied — add us on LINE, paste it in the chat and send, and we'll be in touch within 1–2 days.",
     formSuccessIg:
       "Thanks! Your request is copied — paste it into the Instagram DM and send, and we'll be in touch within 1–2 days.",
     formSuccessEmail:
       "Thanks! Your email app should have opened with your request — just hit send, and we'll be in touch within 1–2 days.",
+    formEmailFallback: "If your email app didn't open, copy the message below and send it to {email}.",
+    formBlocked: 'Your browser blocked the new tab — use the button below to open it.',
+    formOpenLine: 'Open LINE →',
+    formOpenIg: 'Open Instagram DM →',
+    formOpenEmail: 'Open email app →',
     formSubjectPrefix: 'Custom order request — ',
     formNameLine: 'Name: ',
     formDateLine: 'Event date: ',
@@ -102,7 +112,11 @@ export const en: SiteContent = {
     orderMsgLabel: 'Your message',
     orderLineCta: 'Order on LINE',
     orderIgCta: 'Order on Instagram',
+    orderEmailCta: 'Order by email',
+    orderEmailSubject: 'Order — ',
     orderIgCopied: 'Message copied — paste it in the DM and send.',
+    orderLineCopied: 'Message copied — add us on LINE, then paste it in the chat and send.',
+    copyFailed: "We couldn't copy it automatically — please select the message and copy it yourself.",
     orderCancel: 'Cancel',
     copyBtn: 'Copy',
     copiedBtn: 'Copied ✓',

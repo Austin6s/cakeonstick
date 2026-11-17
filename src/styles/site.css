@@ -1049,6 +1049,31 @@ picture {
   flex-wrap: wrap;
   gap: 12px;
 }
+/* After sending: what happened, the message with a Copy button, and a direct link. */
+.form-result {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.order-message {
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.order-message.is-on-tint {
+  background: var(--white);
+  border-color: var(--border-default);
+}
+.form-open {
+  align-self: flex-start;
+  font-size: 14px;
+  font-weight: 600;
+}
+.form-open:empty {
+  display: none;
+}
+.field [aria-invalid='true'] {
+  border-color: var(--coral-text);
+}
 .form-status {
   font-size: 14px;
   font-weight: 600;
