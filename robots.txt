@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://austin6s.github.io/cakeonstick/sitemap.xml
+Sitemap: https://cakeonstick.com/sitemap.xml
