@@ -1,0 +1,83 @@
+---
+/**
+ * One card for gift sets and party packages. The picture area handles all three
+ * cases: one photo, several photos (a swipeable carousel), or no photo yet.
+ * The body (name, prices, the order button) is passed in by the page.
+ */
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import logoMark from '../assets/logo/logo-black-icon.png';
+import Photo from './Photo.astro';
+
+interface Props {
+  id: string;
+  name: string;
+  photos: ImageMetadata[];
+  /** Alt text per photo when there are several. */
+  photoLabels?: string[];
+  badge?: string;
+  labels: { prev: string; next: string; photoN: string };
+  /** Clicking the photo opens the quick-order dialog too. */
+  photoOpensOrder?: boolean;
+}
+const { id, name, photos, photoLabels = [], badge, labels, photoOpensOrder = false } = Astro.props;
+const widths = [320, 480, 640, 800, 1080];
+const sizes = '(min-width: 1240px) 280px, (min-width: 584px) 46vw, 92vw';
+---
+
+<div class="card">
+  <div class="card-media" data-carousel={photos.length > 1 ? '' : undefined}>
+    {
+      photos.length === 0 && (
+        <div class="card-empty">
+          <Image src={logoMark} alt="" width={96} densities={[1, 2]} loading="lazy" />
+        </div>
+      )
+    }
+    {
+      photos.length === 1 && (
+        <Photo
+          src={photos[0]}
+          alt={name}
+          widths={widths}
+          sizes={sizes}
+          class="photo"
+          data-order-media={photoOpensOrder ? id : undefined}
+        />
+      )
+    }
+    {
+      photos.length > 1 && (
+        <>
+          <div class="carousel-track" data-carousel-track>
+            {photos.map((photo, j) => (
+              <div class="carousel-slide">
+                <Photo src={photo} alt={photoLabels[j] ?? name} widths={widths} sizes={sizes} class="photo" />
+              </div>
+            ))}
+          </div>
+          <button class="carousel-arrow is-prev" type="button" aria-label={labels.prev} data-carousel-prev>
+            ‹
+          </button>
+          <button class="carousel-arrow is-next" type="button" aria-label={labels.next} data-carousel-next>
+            ›
+          </button>
+          <div class="carousel-dots">
+            {photos.map((_, j) => (
+              <button
+                type="button"
+                aria-label={`${labels.photoN}${j + 1}`}
+                aria-current={j === 0 ? 'true' : 'false'}
+                data-carousel-dot
+              >
+                <span />
+              </button>
+            ))}
+          </div>
+        </>
+      )
+    }
+    {badge && <div class="card-badge">{badge}</div>}
+  </div>
+  <slot />
+</div>

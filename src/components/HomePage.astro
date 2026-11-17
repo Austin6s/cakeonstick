@@ -1,0 +1,398 @@
+---
+/**
+ * The whole one-page site for one language. Sections, in order: header, hero,
+ * trust badges and schedule, shop, party packages, story, process, follow, FAQ,
+ * contact, nutrition, footer, and one quick-order dialog per set and package.
+ */
+import { Image } from 'astro:assets';
+import logoCoral from '../assets/logo/logo-coral.png';
+import logoWhite from '../assets/logo/logo-white.png';
+import babyBoy from '../assets/photos/baby-boy-newborn.png';
+import babyGirl from '../assets/photos/baby-girl-newborn.png';
+import hero from '../assets/photos/drizzle-trio-coral-bg.png';
+import loveSet from '../assets/photos/love-set.png';
+import { content, settings } from '../content';
+import { photos } from '../content/photos';
+import type { Lang } from '../content/types';
+import Base from '../layouts/Base.astro';
+import { HERO } from '../lib/images';
+import { links } from '../lib/site';
+import Badge from './Badge.astro';
+import Button from './Button.astro';
+import Field from './Field.astro';
+import Footer from './Footer.astro';
+import Header from './Header.astro';
+import OrderDialog from './OrderDialog.astro';
+import Photo from './Photo.astro';
+import ProductCard from './ProductCard.astro';
+import SectionHeading from './SectionHeading.astro';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const site = content[lang];
+const t = site.strings;
+
+const price = (shown: string) => (settings.showPrices ? shown : t.dmForPricing);
+const cardLabels = { prev: t.prevPhoto, next: t.nextPhoto, photoN: t.photoN };
+
+const products = site.products.map((p) => {
+  const priceDisplay = price(p.price);
+  return { ...p, priceDisplay, photos: photos[p.id] ?? [], message: site.productMessage(p.name, priceDisplay) };
+});
+const packages = site.packages.map((k) => ({
+  ...k,
+  photos: photos[k.id] ?? [],
+  message: site.packageMessage(k.name, k.sizes),
+}));
+const packageRows = [
+  { label: t.pkgSize15, value: price(settings.packagePrices.p15) },
+  { label: t.pkgSize21, value: price(settings.packagePrices.p21) },
+  { label: t.pkgSize30, value: price(settings.packagePrices.p30) },
+];
+const followTiles = [
+  { src: hero, alt: 'Cake on Stick cakesicles' },
+  { src: loveSet, alt: "Valentine's Collection cakesicles" },
+  { src: babyGirl, alt: 'Baby Girl Gift Set cakesicles' },
+  { src: babyBoy, alt: 'Baby Boy Gift Set cakesicles' },
+];
+---
+
+<Base lang={lang}>
+  <slot name="head-first" slot="head-first" />
+  <a class="skip-link" href="#main">{t.skipToContent}</a>
+  <Header lang={lang} t={t} />
+
+  <main id="main">
+    <!-- HERO -->
+    <section class="hero on-dark">
+      <Photo src={hero} alt="" widths={HERO.widths} sizes={HERO.sizes} quality={HERO.quality} class="hero-photo" eager />
+      <div class="hero-scrim"></div>
+      <div class="hero-inner">
+        <div class="hero-copy">
+          <Image src={logoWhite} alt="Cake on Stick" width={210} densities={[1, 2, 3]} class="hero-logo" loading="eager" />
+          <h1>{t.heroTitle}</h1>
+          <p class="hero-body">{t.heroBody}</p>
+          <div class="hero-ctas">
+            <Button variant="primary" size="lg" href="#contact">{t.heroCtaPrimary}</Button>
+            <Button variant="secondary" size="lg" onDark href={links.igUrl} newTab>{t.heroCtaSecondary}</Button>
+            <a class="btn-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line={links.lineAddPath}>{t.followLineCta}</a>
+          </div>
+          <p class="hero-note">{t.heroNote}</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TRUST STRIP -->
+    <div class="trust">
+      <div class="trust-badges">
+        <Badge>{t.badge1}</Badge>
+        <Badge>{t.badge2}</Badge>
+        <Badge>{t.badge3}</Badge>
+        <Badge>{t.badge4}</Badge>
+      </div>
+      <p class="trust-schedule"><strong>{t.scheduleLead}</strong> {t.scheduleBody}</p>
+    </div>
+
+    <!-- SHOP THE COLLECTION -->
+    <section id="shop" class="shop">
+      <div class="shop-head">
+        <SectionHeading eyebrow={t.shopEyebrow} title={t.shopTitle} />
+      </div>
+      <div class="card-grid">
+        {
+          products.map((p) => (
+            <ProductCard
+              id={p.id}
+              name={p.name}
+              photos={p.photos}
+              photoLabels={p.photoLabels}
+              badge={p.badge}
+              labels={cardLabels}
+              photoOpensOrder
+            >
+              <button class="product-body" type="button" data-order={p.id}>
+                <span class="product-name">{p.name}</span>
+                <span class="product-meta">
+                  <span class="product-price">{p.priceDisplay}</span>
+                  <span class="product-cta">{t.pkgCta} →</span>
+                </span>
+              </button>
+            </ProductCard>
+          ))
+        }
+      </div>
+      <p class="section-note">
+        {t.shopNoteA}
+        <a href={links.igUrl} target="_blank" rel="noopener">{links.igHandle}</a>
+        {t.shopNoteB}
+        <a href={links.lineAddUrl} target="_blank" rel="noopener">LINE</a>{t.shopNoteC}
+      </p>
+    </section>
+
+    <!-- PARTY PACKAGES -->
+    <section id="packages" class="packages">
+      <SectionHeading eyebrow={t.pkgEyebrow} title={t.pkgTitle} />
+      <p class="packages-intro">{t.pkgIntro}</p>
+      <div class="card-grid">
+        {
+          packages.map((k) => (
+            <ProductCard id={k.id} name={k.name} photos={k.photos} photoLabels={k.photoLabels} labels={cardLabels}>
+              <div class="package-body">
+                <h3>{k.name}</h3>
+                <dl class="package-prices">
+                  {packageRows.map((row) => (
+                    <div>
+                      <dt>{row.label}</dt>
+                      <dd>{row.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <button class="package-order" type="button" data-order={k.id} aria-label={`${t.pkgCta} — ${k.name}`}>
+                  {t.pkgCta}
+                </button>
+              </div>
+            </ProductCard>
+          ))
+        }
+      </div>
+      <p class="section-note">
+        {t.pkgMoreA}
+        <a href="#contact">{t.pkgMoreLink}</a>{t.pkgMoreB}
+      </p>
+    </section>
+
+    <!-- OUR STORY -->
+    <section id="story" class="tint">
+      <div class="split">
+        <div>
+          <SectionHeading eyebrow={t.storyEyebrow} title={t.storyTitle} />
+          <p class="story-p">{t.storyP1}</p>
+          <p class="story-p">{t.storyP2}</p>
+          <a class="story-link" href={links.igUrl} target="_blank" rel="noopener">{t.storyIgLink}</a>
+        </div>
+        <div class="story-photo">
+          <Photo
+            src={logoCoral}
+            alt="Cake on Stick"
+            widths={[640, 960, 1280, 1920]}
+            sizes="(min-width: 768px) 1100px, 222vw"
+          />
+        </div>
+      </div>
+    </section>
+
+    <!-- CUSTOM ORDER PROCESS -->
+    <section id="process" class="process">
+      <div class="container">
+        <SectionHeading eyebrow={t.processEyebrow} title={t.processTitle} align="center" />
+        <ol class="steps">
+          {
+            site.steps.map((s) => (
+              <li class="step">
+                <div class="step-n" aria-hidden="true">
+                  {s.n}
+                </div>
+                <h3>{s.title}</h3>
+                <p>{s.body}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <!-- INSTAGRAM / FOLLOW -->
+    <section class="tint">
+      <div class="follow">
+        <SectionHeading eyebrow={t.followEyebrow} title={t.followTitle} align="center" />
+        <p class="follow-body">{t.followBody}</p>
+        <div class="follow-grid">
+          {
+            followTiles.map((tile) => (
+              <a href={links.igUrl} target="_blank" rel="noopener">
+                <Photo src={tile.src} alt={tile.alt} widths={[160, 320, 480, 640]} sizes="(min-width: 640px) 25vw, 50vw" />
+              </a>
+            ))
+          }
+        </div>
+        <div class="follow-ctas">
+          <Button variant="primary" size="lg" href={links.igUrl} newTab>{t.followCta}</Button>
+          <a class="btn-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line={links.lineAddPath}>{t.followLineCta}</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="faq">
+      <SectionHeading eyebrow={t.faqEyebrow} title={t.faqTitle} />
+      <div class="faq-list">
+        {
+          site.faqs.map((f, i) => (
+            <details class="faq-item" name="faq" open={i === 0}>
+              <summary>
+                <h3>{f.q}</h3>
+                <span class="faq-ind" aria-hidden="true" />
+              </summary>
+              <p class="faq-a">{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- CONTACT / CUSTOM ORDER FORM -->
+    <section id="contact" class="tint">
+      <div class="split is-top">
+        <div>
+          <SectionHeading eyebrow={t.contactEyebrow} title={t.contactTitle} />
+          <p class="contact-p">{t.contactP1}</p>
+          <p class="contact-p is-strong">{t.contactChannels}</p>
+          <div class="contact-channels">
+            <a class="channel is-ig" href={links.igUrl} target="_blank" rel="noopener">{t.contactIgBtn}</a>
+            <a class="channel is-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line={links.lineAddPath}>{t.contactLineBtn}</a>
+            <a class="channel is-email" href={links.mailto}>{t.contactEmailBtn}</a>
+          </div>
+          <p class="contact-p is-last">{t.contactP3}</p>
+        </div>
+        <!-- The form sends nothing to a server: it writes the message and hands it to
+             LINE or to the visitor's mail app. Without JavaScript it falls back to mail. -->
+        <form
+          class="contact-form"
+          action={links.mailto}
+          method="post"
+          enctype="text/plain"
+          data-contact-form
+          data-line-id={settings.lineId}
+          data-email={settings.contactEmail}
+          data-subject-prefix={t.formSubjectPrefix}
+          data-name-line={t.formNameLine}
+          data-date-line={t.formDateLine}
+          data-no-details={t.formNoDetails}
+          data-success-line={t.formSuccessLine}
+          data-success-email={t.formSuccessEmail}
+        >
+          <Field label={t.formName} name="name" placeholder={t.formNamePh} required autocomplete="name" />
+          <Field label="Email" name="email" type="email" placeholder="jane@email.com" required autocomplete="email" />
+          <Field label={t.formDate} name="date" type="date" />
+          <Field label={t.formMessage} name="message" placeholder={t.formMessagePh} rows={4} />
+          <div class="form-actions">
+            <button class="btn-line" type="submit" data-via="line">{t.formSendLine}</button>
+            <button class="btn-outline" type="submit" data-via="email">{t.formSendEmail}</button>
+          </div>
+          <p class="form-status is-error" role="alert" data-form-error hidden>{t.formError}</p>
+          <p class="form-status is-success" role="status" data-form-success hidden></p>
+        </form>
+      </div>
+    </section>
+
+    <!-- NUTRITION / ALLERGEN INFO -->
+    <section id="nutrition">
+      <div class="nutrition">
+        <SectionHeading eyebrow={t.nutritionEyebrow} title={t.nutritionTitle} />
+        <p class="nutrition-serving">{t.nutritionServingSize}</p>
+        <div class="nutrition-grid">
+          {
+            site.nutrition.map((n) => (
+              <div class="facts">
+                <h3>{n.name}</h3>
+                <div class="facts-servings">{t.nutritionServingsLabel}</div>
+                <table>
+                  <thead>
+                    <tr>
+                      <td />
+                      <th class="col-serving" scope="col">
+                        {t.nutritionPerServing}
+                      </th>
+                      <th class="col-100g" scope="col">
+                        {t.nutritionPer100g}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="is-calories">
+                      <th scope="row">{t.nutritionCalories}</th>
+                      <td>{n.servingCal}</td>
+                      <td>{n.per100Cal}</td>
+                    </tr>
+                    <tr class="is-major">
+                      <th scope="row">{t.nutritionFat}</th>
+                      <td>{n.servingFat}</td>
+                      <td>{n.per100Fat}</td>
+                    </tr>
+                    <tr class="is-sub">
+                      <th scope="row">{t.nutritionSatFat}</th>
+                      <td>{n.servingSatFat}</td>
+                      <td>{n.per100SatFat}</td>
+                    </tr>
+                    <tr class="is-sub">
+                      <th scope="row">{t.nutritionTransFat}</th>
+                      <td>{n.servingTransFat}</td>
+                      <td>{n.per100TransFat}</td>
+                    </tr>
+                    <tr class="is-major">
+                      <th scope="row">{t.nutritionCarb}</th>
+                      <td>{n.servingCarb}</td>
+                      <td>{n.per100Carb}</td>
+                    </tr>
+                    <tr class="is-sub">
+                      <th scope="row">{t.nutritionSugar}</th>
+                      <td>{n.servingSugar}</td>
+                      <td>{n.per100Sugar}</td>
+                    </tr>
+                    <tr class="is-major is-thick">
+                      <th scope="row">{t.nutritionProtein}</th>
+                      <td>{n.servingProtein}</td>
+                      <td>{n.per100Protein}</td>
+                    </tr>
+                    <tr class="is-major is-last">
+                      <th scope="row">{t.nutritionSodium}</th>
+                      <td>{n.servingSodium}</td>
+                      <td>{n.per100Sodium}</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="facts-ingredients">
+                  <h4>{t.ingredientsLabel}</h4>
+                  <p>{n.ingredients}</p>
+                </div>
+              </div>
+            ))
+          }
+        </div>
+        <ul class="allergens">
+          <li>{t.allergenNote1}</li>
+          <li>{t.allergenNote2}</li>
+        </ul>
+        <a class="nutrition-back" href="#">{t.nutritionBack}</a>
+      </div>
+    </section>
+  </main>
+
+  <Footer t={t} />
+
+  <!-- QUICK ORDER -->
+  {
+    products.map((p) => (
+      <OrderDialog
+        id={p.id}
+        name={p.name}
+        priceDisplay={p.priceDisplay}
+        photo={p.photos[0]}
+        flavors={p.flavors}
+        message={p.message}
+        t={t}
+      />
+    ))
+  }
+  {
+    packages.map((k) => (
+      <OrderDialog id={k.id} name={k.name} priceDisplay={k.sizes} photo={k.photos[0]} message={k.message} t={t} />
+    ))
+  }
+
+  <script>
+    import '../scripts/site';
+  </script>
+</Base>

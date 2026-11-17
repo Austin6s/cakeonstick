@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <script src="./ds-base.js"></script>
+</helmet>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px 16px; font-family: var(--font-body);">
+  <div style="display: flex; flex-direction: column; gap: 2px;">
+    <sc-if value="{{pair.isArea}}" hint-placeholder-val="{{false}}">
+      <x-import component-from-global-scope="CakeOnStickDesignSystem_a9f058.Textarea" label="{{pair.labelZh}}" rows="{{pair.rows}}" value="{{pair.valZh}}" on-change="{{pair.onZh}}" hint-size="100%,110px"></x-import>
+    </sc-if>
+    <sc-if value="{{pair.isLine}}" hint-placeholder-val="{{true}}">
+      <x-import component-from-global-scope="CakeOnStickDesignSystem_a9f058.Input" label="{{pair.labelZh}}" placeholder="{{pair.phZh}}" value="{{pair.valZh}}" on-change="{{pair.onZh}}" hint-size="100%,70px"></x-import>
+    </sc-if>
+    <button onClick="{{pair.toZh}}" style="align-self: flex-start; background: none; border: none; padding: 4px 0 0; font-family: var(--font-body); font-size: 12px; font-weight: 600; color: {{pair.zhBtnColor}}; cursor: pointer;" style-hover="color: var(--brand-primary);">{{pair.toZhLabel}}</button>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 2px;">
+    <sc-if value="{{pair.isArea}}" hint-placeholder-val="{{false}}">
+      <x-import component-from-global-scope="CakeOnStickDesignSystem_a9f058.Textarea" label="{{pair.labelEn}}" rows="{{pair.rows}}" value="{{pair.valEn}}" on-change="{{pair.onEn}}" hint-size="100%,110px"></x-import>
+    </sc-if>
+    <sc-if value="{{pair.isLine}}" hint-placeholder-val="{{true}}">
+      <x-import component-from-global-scope="CakeOnStickDesignSystem_a9f058.Input" label="{{pair.labelEn}}" placeholder="{{pair.phEn}}" value="{{pair.valEn}}" on-change="{{pair.onEn}}" hint-size="100%,70px"></x-import>
+    </sc-if>
+    <button onClick="{{pair.toEn}}" style="align-self: flex-start; background: none; border: none; padding: 4px 0 0; font-family: var(--font-body); font-size: 12px; font-weight: 600; color: {{pair.enBtnColor}}; cursor: pointer;" style-hover="color: var(--brand-primary);">{{pair.toEnLabel}}</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:720,&quot;height&quot;:170},&quot;pair&quot;:{&quot;editor&quot;:null,&quot;tsType&quot;:&quot;object&quot;}}"></script>
+</body>
+</html>

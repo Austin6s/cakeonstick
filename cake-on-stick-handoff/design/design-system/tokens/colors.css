@@ -1,0 +1,59 @@
+/* Cake on Stick — Color tokens
+   Brand palette: dark charcoal, white, coral red. Everything else is a tint/shade
+   derived from those three so the system stays true to "dark gray, white, coral red." */
+
+:root {
+  /* ---- Base coral (primary/brand) ---- */
+  --coral-50:  #fff1f0;
+  --coral-100: #ffdedb;
+  --coral-200: #ffbdb6;
+  --coral-300: #ff958b;
+  --coral-400: #ff7166;
+  --coral-500: #ff5a56; /* brand coral — sampled from logo lockup background */
+  --coral-600: #f23f3c;
+  --coral-700: #cc302e;
+  --coral-800: #a3282a;
+  --coral-900: #7a1f22;
+
+  /* ---- Base charcoal (dark neutral) ---- */
+  --charcoal-50:  #f4f4f5;
+  --charcoal-100: #e4e4e6;
+  --charcoal-200: #c7c7cb;
+  --charcoal-300: #a3a3a9;
+  --charcoal-400: #767679;
+  --charcoal-500: #4d4d50;
+  --charcoal-600: #38383b;
+  --charcoal-700: #2e2e30; /* brand charcoal — sampled from logo lockup background */
+  --charcoal-800: #222224;
+  --charcoal-900: #171718;
+
+  /* ---- Base white ---- */
+  --white: #ffffff;
+
+  /* ---- Semantic aliases ---- */
+  --bg-page:        var(--white);
+  --bg-surface:     var(--white);
+  --bg-surface-tint: var(--coral-50);
+  --bg-dark:        var(--charcoal-700);
+  --bg-dark-deep:   var(--charcoal-900);
+
+  --text-primary:   var(--charcoal-700);
+  --text-secondary: var(--charcoal-400);
+  --text-inverse:   var(--white);
+  --text-on-coral:  var(--white);
+
+  --brand-primary:      var(--coral-500);
+  --brand-primary-hover:var(--coral-600);
+  --brand-primary-press:var(--coral-700);
+
+  --border-subtle:  var(--charcoal-100);
+  --border-default: var(--charcoal-200);
+  --border-on-dark: var(--charcoal-500);
+
+  --focus-ring: var(--coral-400);
+
+  /* ---- Photography-only accent tints (seen in seasonal packaging, NOT brand UI colors) ---- */
+  --tint-blush:     #f6d9d2;  /* Valentine's collection backdrop */
+  --tint-baby-blue: #cfe0ea;  /* gender-reveal boy set */
+  --tint-baby-pink: #f6d8dd;  /* gender-reveal girl set */
+}

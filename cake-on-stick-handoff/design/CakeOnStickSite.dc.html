@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Cake on Stick — Marketing Site" description="Bilingual (zh-TW primary / EN) marketing homepage: hero, trust signals, shop grid, our story, custom order process, Instagram funnel, FAQ, contact, footer" -->
+<helmet>
+  <script src="./ds-base.js"></script>
+  <title>Cake on Stick — 手工蛋糕棒 · Handmade Cakesicles</title>
+  <meta name="description" content="手工蛋糕棒——送禮、慶祝、客製主題派對套組。IG 私訊即可訂購。Handmade cakesicles, custom party packages. Order by Instagram DM.">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; }
+    a { color: var(--coral-text); text-decoration: none; }
+    a:hover { color: var(--coral-800); }
+    a:focus-visible, button:focus-visible { outline: 2px solid var(--coral-700); outline-offset: 2px; }
+    html:root {
+      --font-display: "Poppins", "Noto Sans TC", "Century Gothic", Futura, sans-serif !important;
+      --font-body: "Inter", "Noto Sans TC", Poppins, sans-serif !important;
+      /* Small coral text: brand coral (#ff5a56) is only 3.1:1 on white, coral-700 is 5.2:1 */
+      --coral-text: var(--coral-700);
+      /* Secondary text darkened from #767679 so it also passes 4.5:1 on the coral-tint sections */
+      --text-secondary: #6b6b6f !important;
+      /* LINE green (#06C755) is 2.3:1 as text on white; this shade is 5:1 */
+      --line-green-text: #05803a;
+    }
+  </style>
+</helmet>
+
+<div style="font-family: var(--font-body); background: var(--white); color: var(--text-primary);">
+
+  <!-- HEADER -->
+  <header style="position: sticky; top: 0; z-index: 50; background: var(--white); border-bottom: 1px solid var(--border-subtle);">
+    <div style="max-width: var(--container-max); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 18px clamp(20px, 5vw, 64px); gap: 20px;">
+      <a href="#" onClick="{{goTop}}" style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+        <img src="assets/logo/logo-black-icon.png" alt="" style="height: 40px; width: auto; display: block;">
+        <span style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 18px; letter-spacing: var(--tracking-wordmark); text-transform: uppercase; color: var(--text-primary); white-space: nowrap;">Cake on Stick</span>
+      </a>
+
+      <sc-if value="{{isDesktop}}" hint-placeholder-val="{{true}}">
+        <nav style="display: flex; align-items: center; gap: 24px; white-space: nowrap;">
+          <a href="#shop" onClick="{{goShop}}" style="font-size: 14px; font-weight: 500; color: var(--text-primary);" style-hover="color: var(--brand-primary);">{{t.navShop}}</a>
+          <a href="#packages" onClick="{{goPackages}}" style="font-size: 14px; font-weight: 500; color: var(--text-primary);" style-hover="color: var(--brand-primary);">{{t.navPackages}}</a>
+          <a href="#story" onClick="{{goStory}}" style="font-size: 14px; font-weight: 500; color: var(--text-primary);" style-hover="color: var(--brand-primary);">{{t.navStory}}</a>
+          <a href="#process" onClick="{{goProcess}}" style="font-size: 14px; font-weight: 500; color: var(--text-primary);" style-hover="color: var(--brand-primary);">{{t.navProcess}}</a>
+          <a href="#faq" onClick="{{goFaq}}" style="font-size: 14px; font-weight: 500; color: var(--text-primary);" style-hover="color: var(--brand-primary);">{{t.navFaq}}</a>
+        </nav>
+        <div style="display: flex; align-items: center; gap: 18px;">
+          <div style="display: flex; align-items: center; gap: 0; border: 1px solid var(--border-default); border-radius: var(--radius-pill); overflow: hidden;">
+            <button onClick="{{setZh}}" aria-pressed="{{zhPressed}}" style="padding: 7px 14px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; font-family: var(--font-body); white-space: nowrap; background: {{zhBg}}; color: {{zhColor}};">中文</button>
+            <button onClick="{{setEn}}" aria-pressed="{{enPressed}}" style="padding: 7px 14px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; font-family: var(--font-body); white-space: nowrap; background: {{enBg}}; color: {{enColor}};">EN</button>
+          </div>
+          <a href="{{igUrl}}" target="_blank" rel="noopener" style="font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap;" style-hover="color: var(--brand-primary);">Instagram</a>
+          <a href="{{lineAddUrl}}" onClick="{{lineLinkClick}}" style="font-size: 14px; font-weight: 600; color: var(--text-primary); white-space: nowrap;" style-hover="color: var(--line-green-text);">LINE</a>
+          <x-import component-from-global-scope="{{namespace}}.Button" variant="primary" size="sm" on-click="{{goContact}}" hint-size="140px,38px">{{t.navCta}}</x-import>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{isMobile}}" hint-placeholder-val="{{false}}">
+        <div style="display: flex; align-items: center; gap: 12px;">
+          <div style="display: flex; align-items: center; gap: 0; border: 1px solid var(--border-default); border-radius: var(--radius-pill); overflow: hidden;">
+            <button onClick="{{setZh}}" aria-pressed="{{zhPressed}}" style="min-height: 44px; padding: 8px 14px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; font-family: var(--font-body); white-space: nowrap; background: {{zhBg}}; color: {{zhColor}};">中文</button>
+            <button onClick="{{setEn}}" aria-pressed="{{enPressed}}" style="min-height: 44px; padding: 8px 14px; font-size: 13px; font-weight: 600; border: none; cursor: pointer; font-family: var(--font-body); white-space: nowrap; background: {{enBg}}; color: {{enColor}};">EN</button>
+          </div>
+          <button onClick="{{toggleMobileNav}}" aria-label="{{menuLabel}}" aria-expanded="{{menuExpanded}}" style="display: flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: none; border: none; font-size: 24px; line-height: 1; color: var(--text-primary); cursor: pointer; padding: 0;">{{mobileNavIcon}}</button>
+        </div>
+      </sc-if>
+    </div>
+
+    <sc-if value="{{mobileNavOpen}}" hint-placeholder-val="{{false}}">
+      <div style="display: flex; flex-direction: column; gap: 2px; padding: 4px clamp(20px, 5vw, 64px) 24px; border-top: 1px solid var(--border-subtle); background: var(--white); max-height: calc(100vh - 80px); overflow-y: auto;">
+        <a href="#shop" onClick="{{goShop}}" style="padding: 14px 0; font-size: 16px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--border-subtle);">{{t.navShop}}</a>
+        <a href="#packages" onClick="{{goPackages}}" style="padding: 14px 0; font-size: 16px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--border-subtle);">{{t.navPackages}}</a>
+        <a href="#story" onClick="{{goStory}}" style="padding: 14px 0; font-size: 16px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--border-subtle);">{{t.navStory}}</a>
+        <a href="#process" onClick="{{goProcess}}" style="padding: 14px 0; font-size: 16px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--border-subtle);">{{t.navProcess}}</a>
+        <a href="#faq" onClick="{{goFaq}}" style="padding: 14px 0; font-size: 16px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--border-subtle);">{{t.navFaq}}</a>
+        <a href="#nutrition" onClick="{{goNutrition}}" style="padding: 14px 0; font-size: 16px; font-weight: 500; color: var(--text-primary); border-bottom: 1px solid var(--border-subtle);">{{t.nutritionEyebrow}}</a>
+        <a href="{{igUrl}}" target="_blank" rel="noopener" style="padding: 14px 0; font-size: 16px; font-weight: 600; color: var(--coral-text); border-bottom: 1px solid var(--border-subtle);">Instagram {{igHandle}}</a>
+        <a href="{{lineAddUrl}}" onClick="{{lineLinkClick}}" style="padding: 14px 0; font-size: 16px; font-weight: 600; color: var(--line-green-text);">LINE {{lineIdDisplay}}</a>
+        <div style="margin-top: 10px;">
+          <x-import component-from-global-scope="{{namespace}}.Button" variant="primary" size="lg" on-click="{{goContact}}" hint-size="100%,52px">{{t.heroCtaPrimary}}</x-import>
+        </div>
+      </div>
+    </sc-if>
+  </header>
+
+  <!-- HERO -->
+  <section data-screen-label="Home" style="position: relative; min-height: clamp(520px, 85vh, 660px); display: flex; align-items: center; overflow: hidden; background: var(--charcoal-700);">
+    <img src="assets/photography/drizzle-trio-coral-bg.jpg" alt="" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.55;">
+    <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(46,46,48,0.92) 0%, rgba(46,46,48,0.55) 55%, rgba(46,46,48,0.15) 100%);"></div>
+    <div style="position: relative; max-width: var(--container-max); margin: 0 auto; padding: 72px clamp(20px, 5vw, 64px); width: 100%;">
+      <div style="max-width: 560px;">
+        <img src="assets/logo/logo-white.png" alt="Cake on Stick" style="width: 210px; display: block; margin: 0 0 28px 0;">
+        <h1 style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: var(--size-display-xl); line-height: var(--leading-display); color: var(--white); margin: 0 0 20px 0; max-width: 482px; white-space: pre-line; text-wrap: balance;">{{t.heroTitle}}</h1>
+        
+        <p style="font-size: var(--size-body-lg); color: var(--charcoal-100); line-height: var(--leading-body); margin: 0 0 32px 0; max-width: 460px;">{{t.heroBody}}</p><div style="display: flex; gap: 14px; flex-wrap: wrap;">
+          <x-import component-from-global-scope="{{namespace}}.Button" variant="primary" size="lg" on-click="{{goContact}}" hint-size="220px,56px">{{t.heroCtaPrimary}}</x-import>
+          <x-import component-from-global-scope="{{namespace}}.Button" variant="secondary" size="lg" on-dark="{{true}}" on-click="{{openInstagram}}" hint-size="220px,56px">{{t.heroCtaSecondary}}</x-import>
+          <button onClick="{{openLineAdd}}" style="display: flex; align-items: center; justify-content: center; padding: 16px 30px; border-radius: var(--radius-pill); font-family: var(--font-body); font-weight: 600; font-size: 16px; cursor: pointer; border: none; background: #06C755; color: var(--white);" style-hover="background: #05b34c;">{{t.followLineCta}}</button>
+        </div>
+        <p style="margin: 20px 0 0 0; font-size: 14px; color: var(--charcoal-200);">{{t.heroNote}}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRUST STRIP -->
+  <div style="border-bottom: 1px solid var(--border-subtle);">
+    <div style="max-width: var(--container-max); margin: 0 auto; padding: 28px clamp(20px, 5vw, 64px); display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+      <x-import component-from-global-scope="{{namespace}}.Badge" tone="outline" hint-size="150px,28px">{{t.badge1}}</x-import>
+      <x-import component-from-global-scope="{{namespace}}.Badge" tone="outline" hint-size="150px,28px">{{t.badge2}}</x-import>
+      <x-import component-from-global-scope="{{namespace}}.Badge" tone="outline" hint-size="190px,28px">{{t.badge3}}</x-import>
+      <x-import component-from-global-scope="{{namespace}}.Badge" tone="outline" hint-size="180px,28px">{{t.badge4}}</x-import>
+    </div>
+    <p style="max-width: var(--container-max); margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px) 24px; text-align: center; font-size: 14px; color: var(--text-secondary); line-height: var(--leading-body);"><strong style="color: var(--text-primary);">{{t.scheduleLead}}</strong> {{t.scheduleBody}}</p>
+  </div>
+
+  <!-- SHOP THE COLLECTION -->
+  <section id="shop" data-screen-label="Shop" style="max-width: var(--container-max); margin: 0 auto; padding: 96px clamp(20px, 5vw, 64px) 80px;">
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 40px; gap: 20px; flex-wrap: wrap;">
+      <x-import component-from-global-scope="{{namespace}}.SectionHeading" eyebrow="{{t.shopEyebrow}}" title="{{t.shopTitle}}" hint-size="500px,90px"></x-import>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 24px;">
+      <sc-for list="{{products}}" as="p" hint-placeholder-count="7">
+        <div style="background: var(--white); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; transition: transform var(--duration-base) var(--ease-out-soft), box-shadow var(--duration-base) var(--ease-out-soft);" style-hover="transform: translateY(-3px); box-shadow: var(--shadow-md);">
+          <div style="position: relative; width: 100%; aspect-ratio: 4 / 3; background: var(--bg-surface-tint); overflow: hidden;">
+            <sc-if value="{{p.hasPhoto}}" hint-placeholder-val="{{true}}">
+              <img src="{{p.image}}" alt="{{p.name}}" loading="lazy" onClick="{{p.openOrder}}" style="width: 100%; height: 100%; object-fit: cover; display: block; cursor: pointer;">
+            </sc-if>
+            <sc-if value="{{p.showSlot}}" hint-placeholder-val="{{false}}">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{p.slotId}}" shape="rect" placeholder="{{t.setSlotPh}}" hint-size="100%,100%"></x-import>
+            </sc-if>
+            <sc-if value="{{p.showCarousel}}" hint-placeholder-val="{{false}}">
+              <div style="display: flex; width: 100%; height: 100%; transform: translateX({{p.slideOffset}}); transition: transform var(--duration-base) var(--ease-out-soft);">
+                <sc-for list="{{p.slides}}" as="s" hint-placeholder-count="3">
+                  <div style="flex: 0 0 100%; width: 100%; height: 100%;">
+                    <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{s.slotId}}" shape="rect" placeholder="{{s.placeholder}}" hint-size="100%,100%"></x-import>
+                  </div>
+                </sc-for>
+              </div>
+              <button onClick="{{p.prevSlide}}" aria-label="{{prevLabel}}" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: var(--radius-pill); border: none; background: rgba(255,255,255,0.92); color: var(--text-primary); box-shadow: var(--shadow-sm); font-size: 20px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2;" style-hover="background: var(--white);">‹</button>
+              <button onClick="{{p.nextSlide}}" aria-label="{{nextLabel}}" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: var(--radius-pill); border: none; background: rgba(255,255,255,0.92); color: var(--text-primary); box-shadow: var(--shadow-sm); font-size: 20px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2;" style-hover="background: var(--white);">›</button>
+              <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; z-index: 2; background: rgba(46,46,48,0.45); padding: 0 4px; border-radius: var(--radius-pill);">
+                <sc-for list="{{p.dots}}" as="d" hint-placeholder-count="3">
+                  <button onClick="{{d.go}}" aria-label="{{d.label}}" style="width: 24px; height: 24px; padding: 0; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center;"><span style="width: 8px; height: 8px; border-radius: var(--radius-pill); background: {{d.bg}};"></span></button>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{p.hasBadge}}" hint-placeholder-val="{{false}}">
+              <div style="position: absolute; top: 12px; left: 12px; background: var(--charcoal-700); color: var(--white); font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: var(--radius-pill); pointer-events: none;">{{p.badge}}</div>
+            </sc-if>
+          </div>
+          <button onClick="{{p.openOrder}}" style="flex: 1; width: 100%; background: none; border: none; text-align: left; font-family: var(--font-body); padding: 16px 18px 18px; display: flex; flex-direction: column; gap: 6px; cursor: pointer;">
+            <span style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: var(--size-heading-sm); color: var(--text-primary);">{{p.name}}</span>
+            <span style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+              <span style="font-size: 14px; font-weight: 600; color: var(--coral-text);">{{p.priceDisplay}}</span>
+              <span style="font-size: 13px; font-weight: 600; color: var(--text-primary); white-space: nowrap;">{{t.pkgCta}} →</span>
+            </span>
+          </button>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin: 32px 0 0 0; text-align: center; font-size: var(--size-body-md); color: var(--text-secondary); line-height: var(--leading-body);">{{t.shopNoteA}} <a href="{{igUrl}}" target="_blank" rel="noopener" style="font-weight: 600;">{{igHandle}}</a> {{t.shopNoteB}} <a href="{{lineAddUrl}}" target="_blank" rel="noopener" style="font-weight: 600;">LINE</a>{{t.shopNoteC}}</p>
+  </section>
+
+  <!-- PARTY PACKAGES -->
+  <section id="packages" data-screen-label="Party Packages" style="max-width: var(--container-max); margin: 0 auto; padding: 0 clamp(20px, 5vw, 64px) 96px;">
+    <x-import component-from-global-scope="{{namespace}}.SectionHeading" eyebrow="{{t.pkgEyebrow}}" title="{{t.pkgTitle}}" hint-size="500px,90px"></x-import>
+    <p style="margin: 16px 0 0 0; font-size: var(--size-body-md); color: var(--text-secondary); line-height: var(--leading-body); max-width: 560px;">{{t.pkgIntro}}</p>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr)); gap: 24px; margin-top: 40px;">
+      <sc-for list="{{packages}}" as="k" hint-placeholder-count="3">
+        <div style="background: var(--white); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden; display: flex; flex-direction: column; transition: transform var(--duration-base) var(--ease-out-soft), box-shadow var(--duration-base) var(--ease-out-soft);" style-hover="transform: translateY(-3px); box-shadow: var(--shadow-md);">
+          <sc-if value="{{k.isSingle}}" hint-placeholder-val="{{true}}">
+            <div style="width: 100%; aspect-ratio: 4 / 3; background: var(--bg-surface-tint);">
+              <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{k.slotId}}" shape="rect" placeholder="{{t.pkgSlotPh}}" hint-size="100%,100%"></x-import>
+            </div>
+          </sc-if>
+          <sc-if value="{{k.isCarousel}}" hint-placeholder-val="{{false}}">
+            <div style="position: relative; width: 100%; aspect-ratio: 4 / 3; background: var(--bg-surface-tint); overflow: hidden;">
+              <div style="display: flex; width: 100%; height: 100%; transform: translateX({{k.slideOffset}}); transition: transform var(--duration-base) var(--ease-out-soft);">
+                <sc-for list="{{k.slides}}" as="s" hint-placeholder-count="2">
+                  <div style="flex: 0 0 100%; width: 100%; height: 100%;">
+                    <x-import component-from-global-scope="image-slot" from="./image-slot.js" id="{{s.slotId}}" shape="rect" placeholder="{{s.placeholder}}" hint-size="100%,100%"></x-import>
+                  </div>
+                </sc-for>
+              </div>
+              <button onClick="{{k.prevSlide}}" aria-label="{{prevLabel}}" style="position: absolute; left: 8px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: var(--radius-pill); border: none; background: rgba(255,255,255,0.92); color: var(--text-primary); box-shadow: var(--shadow-sm); font-size: 20px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2;" style-hover="background: var(--white);">‹</button>
+              <button onClick="{{k.nextSlide}}" aria-label="{{nextLabel}}" style="position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border-radius: var(--radius-pill); border: none; background: rgba(255,255,255,0.92); color: var(--text-primary); box-shadow: var(--shadow-sm); font-size: 20px; line-height: 1; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 2;" style-hover="background: var(--white);">›</button>
+              <div style="position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%); display: flex; z-index: 2; background: rgba(46,46,48,0.45); padding: 0 4px; border-radius: var(--radius-pill);">
+                <sc-for list="{{k.dots}}" as="d" hint-placeholder-count="2">
+                  <button onClick="{{d.go}}" aria-label="{{d.label}}" style="width: 24px; height: 24px; padding: 0; border: none; background: none; cursor: pointer; display: flex; align-items: center; justify-content: center;"><span style="width: 8px; height: 8px; border-radius: var(--radius-pill); background: {{d.bg}};"></span></button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <div style="padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 6px;">
+            <h3 style="margin: 0; font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: var(--size-heading-sm); color: var(--text-primary);">{{k.name}}</h3>
+            <div style="display: flex; flex-direction: column; gap: 3px; font-size: 14px; color: var(--text-secondary);">
+              <div style="display: flex; justify-content: space-between; gap: 12px;"><span>{{t.pkgSize15}}</span><span style="font-weight: 600; color: var(--text-primary);">{{pkgPrice15}}</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 12px;"><span>{{t.pkgSize21}}</span><span style="font-weight: 600; color: var(--text-primary);">{{pkgPrice21}}</span></div>
+              <div style="display: flex; justify-content: space-between; gap: 12px;"><span>{{t.pkgSize30}}</span><span style="font-weight: 600; color: var(--text-primary);">{{pkgPrice30}}</span></div>
+            </div>
+            <button onClick="{{k.openOrder}}" style="margin-top: 12px; display: flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 18px; border-radius: var(--radius-pill); font-family: var(--font-body); font-weight: 600; font-size: 14px; cursor: pointer; border: 1.5px solid var(--coral-text); color: var(--coral-text); background: var(--white);" style-hover="background: var(--coral-text); color: var(--white);">{{t.pkgCta}}</button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin: 28px 0 0 0; text-align: center; font-size: var(--size-body-md); color: var(--text-secondary); line-height: var(--leading-body);">{{t.pkgMoreA}} <a href="#contact" onClick="{{goContact}}" style="font-weight: 600;">{{t.pkgMoreLink}}</a>{{t.pkgMoreB}}</p>
+  </section>
+
+  <!-- OUR STORY -->
+  <section id="story" data-screen-label="Our Story" style="background: var(--bg-surface-tint);">
+    <div style="max-width: var(--container-max); margin: 0 auto; padding: 96px clamp(20px, 5vw, 64px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: clamp(36px, 5vw, 64px); align-items: center;">
+      <div>
+        <x-import component-from-global-scope="{{namespace}}.SectionHeading" eyebrow="{{t.storyEyebrow}}" title="{{t.storyTitle}}" hint-size="100%,90px"></x-import>
+        
+        <p style="font-size: var(--size-body-lg); color: var(--text-secondary); line-height: var(--leading-body); margin: 20px 0 0 0; max-width: 480px; white-space: pre-line;">{{t.storyP1}}</p><p style="font-size: var(--size-body-lg); color: var(--text-secondary); line-height: var(--leading-body); margin: 16px 0 0 0; max-width: 480px;">{{t.storyP2}}</p>
+        <a href="{{igUrl}}" target="_blank" rel="noopener" style="display: inline-block; margin-top: 20px; font-size: 14px; font-weight: 600;">{{t.storyIgLink}}</a>
+      </div>
+      <div style="position: relative; width: 100%; aspect-ratio: 4 / 5; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md);">
+        <img src="assets/logo/logo-coral.png" alt="Cake on Stick" loading="lazy" style="width: 100%; height: 100%; object-fit: cover; display: block;">
+      </div>
+    </div>
+  </section>
+
+  <!-- CUSTOM ORDER PROCESS -->
+  <section id="process" data-screen-label="Process" style="padding: 96px clamp(20px, 5vw, 64px);">
+    <div style="max-width: var(--container-max); margin: 0 auto;">
+      <x-import component-from-global-scope="{{namespace}}.SectionHeading" eyebrow="{{t.processEyebrow}}" title="{{t.processTitle}}" align="center" hint-size="100%,90px"></x-import>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); gap: 32px; margin-top: 56px;">
+        <sc-for list="{{steps}}" as="s" hint-placeholder-count="3">
+          <div style="text-align: center; padding: 0 12px;">
+            <div style="width: 56px; height: 56px; border-radius: var(--radius-pill); background: var(--brand-primary); color: var(--white); font-family: var(--font-display); font-weight: 700; font-size: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">{{s.n}}</div>
+            <h3 style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: var(--size-heading-sm); margin: 0 0 10px 0; color: var(--text-primary);">{{s.title}}</h3>
+            <p style="font-size: var(--size-body-md); color: var(--text-secondary); line-height: var(--leading-body); margin: 0;">{{s.body}}</p>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </section>
+
+  <!-- INSTAGRAM / FOLLOW -->
+  <section data-screen-label="Follow" style="background: var(--bg-surface-tint);">
+    <div style="max-width: var(--container-max); margin: 0 auto; padding: 96px clamp(20px, 5vw, 64px);">
+      <x-import component-from-global-scope="{{namespace}}.SectionHeading" eyebrow="{{t.followEyebrow}}" title="{{t.followTitle}}" align="center" hint-size="100%,90px"></x-import>
+      
+      <p style="max-width: 560px; margin: 20px auto 0; text-align: center; font-size: var(--size-body-lg); color: var(--text-secondary); line-height: var(--leading-body);">{{t.followBody}}</p><div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(130px, 100%), 1fr)); gap: 16px; margin-top: 48px;">
+        <a href="{{igUrl}}" target="_blank" rel="noopener" style="display: block; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: transform var(--duration-base) var(--ease-out-soft), box-shadow var(--duration-base) var(--ease-out-soft);" style-hover="transform: translateY(-4px); box-shadow: var(--shadow-md);">
+          <img src="assets/photography/drizzle-trio-coral-bg.jpg" alt="Cake on Stick cakesicles" loading="lazy" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block;">
+        </a>
+        <a href="{{igUrl}}" target="_blank" rel="noopener" style="display: block; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: transform var(--duration-base) var(--ease-out-soft), box-shadow var(--duration-base) var(--ease-out-soft);" style-hover="transform: translateY(-4px); box-shadow: var(--shadow-md);">
+          <img src="assets/photography/love-set.png" alt="Valentine's Collection cakesicles" loading="lazy" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block;">
+        </a>
+        <a href="{{igUrl}}" target="_blank" rel="noopener" style="display: block; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: transform var(--duration-base) var(--ease-out-soft), box-shadow var(--duration-base) var(--ease-out-soft);" style-hover="transform: translateY(-4px); box-shadow: var(--shadow-md);">
+          <img src="assets/photography/baby-girl-newborn.png" alt="Baby Girl Gift Set cakesicles" loading="lazy" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block;">
+        </a>
+        <a href="{{igUrl}}" target="_blank" rel="noopener" style="display: block; border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); transition: transform var(--duration-base) var(--ease-out-soft), box-shadow var(--duration-base) var(--ease-out-soft);" style-hover="transform: translateY(-4px); box-shadow: var(--shadow-md);">
+          <img src="assets/photography/baby-boy-newborn.png" alt="Baby Boy Gift Set cakesicles" loading="lazy" style="width: 100%; aspect-ratio: 1 / 1; object-fit: cover; display: block;">
+        </a>
+      </div>
+      <div style="display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 40px;">
+        <x-import component-from-global-scope="{{namespace}}.Button" variant="primary" size="lg" on-click="{{openInstagram}}" hint-size="220px,56px">{{t.followCta}}</x-import>
+        <button onClick="{{openLineAdd}}" style="display: flex; align-items: center; justify-content: center; padding: 16px 30px; border-radius: var(--radius-pill); font-family: var(--font-body); font-weight: 600; font-size: 16px; cursor: pointer; border: none; background: #06C755; color: var(--white);" style-hover="background: #05b34c;">{{t.followLineCta}}</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" data-screen-label="FAQ" style="max-width: var(--container-max); margin: 0 auto; padding: 96px clamp(20px, 5vw, 64px);">
+    <x-import component-from-global-scope="{{namespace}}.SectionHeading" eyebrow="{{t.faqEyebrow}}" title="{{t.faqTitle}}" hint-size="100%,90px"></x-import>
+    <div style="margin-top: 40px; max-width: 760px;">
+      <sc-for list="{{faqs}}" as="f" hint-placeholder-count="6">
+        <div style="border-bottom: 1px solid var(--border-subtle);">
+          <h3 style="margin: 0;">
+            <button onClick="{{f.toggle}}" aria-expanded="{{f.expanded}}" style="width: 100%; background: none; border: none; display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 4px; cursor: pointer; text-align: left; font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: var(--size-heading-sm); line-height: var(--leading-heading); color: var(--text-primary);">
+              <span>{{f.q}}</span>
+              <span aria-hidden="true" style="font-family: var(--font-body); font-weight: 400; font-size: 22px; line-height: 1; color: var(--brand-primary); flex-shrink: 0; width: 24px; text-align: center;">{{f.indicator}}</span>
+            </button>
+          </h3>
+          <sc-if value="{{f.isOpen}}" hint-placeholder-val="{{false}}">
+            <div style="padding: 0 4px 22px; font-size: var(--size-body-md); color: var(--text-secondary); line-height: var(--leading-body); max-width: 640px;">{{f.a}}</div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <!-- CONTACT / CUSTOM ORDER FORM -->
+  <section id="contact" data-screen-label="Contact" style="background: var(--bg-surface-tint);">
+    <div style="max-width: var(--container-max); margin: 0 auto; padding: 96px clamp(20px, 5vw, 64px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: clamp(36px, 5vw, 64px); align-items: start;">
+      <div>
+        <x-import component-from-global-scope="{{namespace}}.SectionHeading" eyebrow="{{t.contactEyebrow}}" title="{{t.contactTitle}}" hint-size="100%,90px"></x-import>
+        <p style="font-size: var(--size-body-md); color: var(--text-secondary); line-height: var(--leading-body); margin: 20px 0 0 0; max-width: 420px;">{{t.contactP1}}</p>
+        <p style="font-size: var(--size-body-md); color: var(--text-primary); line-height: var(--leading-body); margin: 20px 0 0 0; max-width: 420px; font-weight: 600;">{{t.contactChannels}}</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 14px;">
+          <button onClick="{{openInstagram}}" style="display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 22px; border-radius: var(--radius-pill); font-family: var(--font-body); font-weight: 600; font-size: 15px; cursor: pointer; border: none; background: var(--brand-primary); color: var(--white);" style-hover="background: var(--brand-primary-hover);">{{t.contactIgBtn}}</button>
+          <button onClick="{{openLineAdd}}" style="display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 22px; border-radius: var(--radius-pill); font-family: var(--font-body); font-weight: 600; font-size: 15px; cursor: pointer; border: none; background: #06C755; color: var(--white);" style-hover="background: #05b34c;">{{t.contactLineBtn}}</button>
+          <button onClick="{{openEmail}}" style="display: flex; align-items: center; justify-content: center; min-height: 48px; padding: 12px 22px; border-radius: var(--radius-pill); font-family: var(--font-body); font-weight: 600; font-size: 15px; cursor: pointer; background: var(--white); color: var(--text-primary); border: 1.5px solid var(--border-default);" style-hover="border-color: var(--brand-primary); color: var(--brand-primary);">{{t.contactEmailBtn}}</button>
+        </div>
+        <p style="font-size: var(--size-body-md); color: var(--text-secondary); line-height: var(--leading-body); margin: 16px 0 0 0; max-width: 420px;">{{t.contactP3}}</p>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 18px;">
+        <x-import component-from-global-scope="{{namespace}}.Input" label="{{t.formName}}" placeholder="{{t.formNamePh}}" required="{{true}}" value="{{nameVal}}" on-change="{{onNameChange}}" hint-size="100%,70px"></x-import>
+        <x-import component-from-global-scope="{{namespace}}.Input" label="Email" type="email" placeholder="jane@email.com" required="{{true}}" value="{{emailVal}}" on-change="{{onEmailChange}}" hint-size="100%,70px"></x-import>
+        <x-import component-from-global-scope="{{namespace}}.Input" label="{{t.formDate}}" type="date" value="{{dateVal}}" on-change="{{onDateChange}}" hint-size="100%,70px"></x-import>
+        <x-import component-from-global-scope="{{namespace}}.Textarea" label="{{t.formMessage}}" placeholder="{{t.formMessagePh}}" rows="{{4}}" value="{{messageVal}}" on-change="{{onMessageChange}}" hint-size="100%,120px"></x-import>
+        <x-import component-from-global-scope="{{namespace}}.Button" variant="primary" size="lg" on-click="{{handleSubmit}}" hint-size="200px,56px">{{t.formSubmit}}</x-import>
+        <sc-if value="{{formError}}" hint-placeholder-val="{{false}}">
+          <div role="alert" style="font-size: 14px; color: var(--coral-text); font-weight: 600;">{{t.formError}}</div>
+        </sc-if>
+        <sc-if value="{{submitted}}" hint-placeholder-val="{{false}}">
+          <div role="status" style="font-size: 14px; color: var(--text-primary); font-weight: 600;">{{t.formSuccess}}</div>
+        </sc-if>
+      </div>
+    </div>
+  </section>
+
+  <!-- NUTRITION / ALLERGEN INFO -->
+  <section id="nutrition" data-screen-label="Nutrition Facts" style="background: var(--white);">
+    <div style="max-width: var(--container-max); margin: 0 auto; padding: 96px clamp(20px, 5vw, 64px);">
+      <x-import component-from-global-scope="{{namespace}}.SectionHeading" eyebrow="{{t.nutritionEyebrow}}" title="{{t.nutritionTitle}}" hint-size="100%,90px"></x-import>
+      <p style="margin: 4px 0 0 0; font-size: 13px; color: var(--text-secondary);">{{t.nutritionServingSize}}</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 24px; margin-top: 40px;">
+        <sc-for list="{{nutritionFacts}}" as="n" hint-placeholder-count="3">
+          <div style="background: var(--white); border: 1.5px solid var(--text-primary); border-radius: var(--radius-sm); padding: 18px 20px; font-family: var(--font-body);">
+            <div style="font-family: var(--font-display); font-weight: 700; font-size: 20px; color: var(--text-primary); border-bottom: 8px solid var(--text-primary); padding-bottom: 6px; margin-bottom: 6px;">{{n.name}}</div>
+            <div style="font-size: 13px; color: var(--text-secondary); border-bottom: 1px solid var(--border-default); padding-bottom: 6px; margin-bottom: 6px;">{{t.nutritionServingsLabel}}</div>
+            <div style="display: flex; justify-content: flex-end; gap: 16px; font-size: 12px; font-weight: 700; color: var(--text-secondary); padding-bottom: 4px;"><span style="width: 78px; text-align: right;">{{t.nutritionPerServing}}</span><span style="width: 84px; text-align: right;">{{t.nutritionPer100g}}</span></div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; border-bottom: 4px solid var(--text-primary); padding-bottom: 6px; margin-bottom: 6px; gap: 16px;">
+              <span style="font-weight: 700; font-size: 15px;">{{t.nutritionCalories}}</span>
+              <span style="font-weight: 700; font-size: 15px; display: flex; gap: 16px;"><span style="width: 78px; text-align: right;">{{n.servingCal}}</span><span style="width: 84px; text-align: right;">{{n.per100Cal}}</span></span>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 4px; font-size: 13px;">
+              <div style="display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;"><span style="font-weight: 700;">{{t.nutritionFat}}</span><span style="display: flex; gap: 16px;"><span style="width: 78px; text-align: right;">{{n.servingFat}}</span><span style="width: 84px; text-align: right;">{{n.per100Fat}}</span></span></div>
+              <div style="display: flex; justify-content: space-between; gap: 16px; padding-left: 14px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;"><span>{{t.nutritionSatFat}}</span><span style="display: flex; gap: 16px;"><span style="width: 78px; text-align: right;">{{n.servingSatFat}}</span><span style="width: 84px; text-align: right;">{{n.per100SatFat}}</span></span></div>
+              <div style="display: flex; justify-content: space-between; gap: 16px; padding-left: 14px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;"><span>{{t.nutritionTransFat}}</span><span style="display: flex; gap: 16px;"><span style="width: 78px; text-align: right;">{{n.servingTransFat}}</span><span style="width: 84px; text-align: right;">{{n.per100TransFat}}</span></span></div>
+              <div style="display: flex; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;"><span style="font-weight: 700;">{{t.nutritionCarb}}</span><span style="display: flex; gap: 16px;"><span style="width: 78px; text-align: right;">{{n.servingCarb}}</span><span style="width: 84px; text-align: right;">{{n.per100Carb}}</span></span></div>
+              <div style="display: flex; justify-content: space-between; gap: 16px; padding-left: 14px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 4px;"><span>{{t.nutritionSugar}}</span><span style="display: flex; gap: 16px;"><span style="width: 78px; text-align: right;">{{n.servingSugar}}</span><span style="width: 84px; text-align: right;">{{n.per100Sugar}}</span></span></div>
+              <div style="display: flex; justify-content: space-between; gap: 16px; border-bottom: 8px solid var(--text-primary); padding-bottom: 4px;"><span style="font-weight: 700;">{{t.nutritionProtein}}</span><span style="display: flex; gap: 16px;"><span style="width: 78px; text-align: right;">{{n.servingProtein}}</span><span style="width: 84px; text-align: right;">{{n.per100Protein}}</span></span></div>
+              <div style="display: flex; justify-content: space-between; gap: 16px; padding-top: 4px;"><span style="font-weight: 700;">{{t.nutritionSodium}}</span><span style="display: flex; gap: 16px;"><span style="width: 78px; text-align: right;">{{n.servingSodium}}</span><span style="width: 84px; text-align: right;">{{n.per100Sodium}}</span></span></div>
+            </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--border-default);">
+              <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-primary); margin-bottom: 4px;">{{t.ingredientsLabel}}</div>
+              <div style="font-size: 13px; color: var(--text-secondary); line-height: 1.5;">{{n.ingredients}}</div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <ul style="margin: 24px 0 0 0; padding-left: 18px; font-size: 13px; color: var(--text-secondary); line-height: var(--leading-body); max-width: 640px; display: flex; flex-direction: column; gap: 6px;">
+        <li>{{t.allergenNote1}}</li>
+        <li>{{t.allergenNote2}}</li>
+      </ul>
+      <a href="#" onClick="{{goTop}}" style="display: inline-block; margin-top: 28px; font-size: 14px; font-weight: 600;">{{t.nutritionBack}}</a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer data-screen-label="Footer" style="background: var(--charcoal-700); color: var(--white);">
+    <div style="max-width: var(--container-max); margin: 0 auto; padding: 56px clamp(20px, 5vw, 64px) 32px;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr)); gap: 32px; margin-bottom: 40px;">
+        <div>
+          <img src="assets/logo/logo-white.png" alt="Cake on Stick" style="width: 170px; display: block; margin: 0 0 16px 0;">
+          <p style="color: var(--charcoal-200); font-size: 14px; line-height: 1.6; max-width: 260px; margin: 0;">{{t.footerBlurb}}</p>
+        </div>
+        <div>
+          <div style="font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--charcoal-300); margin-bottom: 14px;">{{t.footerShopHead}}</div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="#shop" onClick="{{goShop}}" style="color: var(--charcoal-100); font-size: 14px;">{{t.footerGiftSets}}</a>
+            <a href="#packages" onClick="{{goPackages}}" style="color: var(--charcoal-100); font-size: 14px;">{{t.footerPackages}}</a>
+            <a href="#contact" onClick="{{goContact}}" style="color: var(--charcoal-100); font-size: 14px;">{{t.footerCustom}}</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--charcoal-300); margin-bottom: 14px;">{{t.footerCompanyHead}}</div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="#story" onClick="{{goStory}}" style="color: var(--charcoal-100); font-size: 14px;">{{t.navStory}}</a>
+            <a href="#faq" onClick="{{goFaq}}" style="color: var(--charcoal-100); font-size: 14px;">{{t.navFaq}}</a>
+            <a href="#contact" onClick="{{goContact}}" style="color: var(--charcoal-100); font-size: 14px;">{{t.footerContact}}</a>
+            <a href="#nutrition" onClick="{{goNutrition}}" style="color: var(--charcoal-100); font-size: 14px;">{{t.nutritionEyebrow}}</a>
+          </div>
+        </div>
+        <div>
+          <div style="font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--charcoal-300); margin-bottom: 14px;">{{t.footerFollowHead}}</div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <a href="{{igUrl}}" target="_blank" rel="noopener" style="color: var(--white); font-size: 15px; font-weight: 600;">Instagram {{igHandle}}</a>
+            <a href="{{lineAddUrl}}" target="_blank" rel="noopener" style="color: var(--white); font-size: 15px; font-weight: 600;">LINE {{lineIdDisplay}}</a>
+          </div>
+        </div>
+      </div>
+      <div style="border-top: 1px solid var(--charcoal-500); padding-top: 20px; font-size: 12px; color: var(--charcoal-300);">{{t.footerCopyright}}</div>
+    </div>
+  </footer>
+
+  <!-- QUICK ORDER SHEET -->
+  <sc-if value="{{orderModalOpen}}" hint-placeholder-val="{{false}}">
+    <div onClick="{{closeOrder}}" style="position: fixed; inset: 0; z-index: 100; background: rgba(46,46,48,0.55); display: flex; align-items: {{modalAlign}}; justify-content: center; padding: {{modalPad}};">
+      <div onClick="{{stopProp}}" role="dialog" aria-modal="true" aria-label="{{orderName}}" style="background: var(--white); border-radius: {{modalRadius}}; box-shadow: var(--shadow-lg); max-width: 440px; width: 100%; max-height: 92vh; overflow-y: auto; overflow-x: hidden; font-family: var(--font-body);">
+        <sc-if value="{{orderHasImage}}" hint-placeholder-val="{{false}}">
+          <img src="{{orderImage}}" alt="" style="width: 100%; height: 170px; object-fit: cover; display: block;">
+        </sc-if>
+        <div style="padding: 24px 24px 20px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap;">
+            <h2 style="margin: 0; font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 20px; color: var(--text-primary);">{{orderName}}</h2>
+            <div style="font-size: 15px; font-weight: 600; color: var(--coral-text); white-space: nowrap;">{{orderPrice}}</div>
+          </div>
+          <sc-if value="{{orderHasFlavors}}" hint-placeholder-val="{{false}}">
+            <div>
+              <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 8px;">{{t.orderFlavorsLabel}}</div>
+              <div style="display: flex; flex-direction: column; gap: 6px;">
+                <sc-for list="{{orderFlavors}}" as="fl" hint-placeholder-count="3">
+                  <div style="display: flex; align-items: baseline; gap: 8px; font-size: 14px; line-height: var(--leading-body);">
+                    <span style="width: 6px; height: 6px; border-radius: 50%; background: var(--brand-primary); flex-shrink: 0; transform: translateY(-2px);"></span>
+                    <span style="color: var(--text-primary); font-weight: 600; white-space: nowrap;">{{fl.name}}</span>
+                    <span style="color: var(--text-secondary);">{{fl.desc}}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <p style="margin: 0; font-size: 14px; color: var(--text-secondary); line-height: var(--leading-body);">{{t.orderHint}}</p>
+          <div>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 6px;">
+              <div style="font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-secondary);">{{t.orderMsgLabel}}</div>
+              <button onClick="{{copyMessage}}" style="background: var(--white); border: 1px solid var(--border-default); border-radius: var(--radius-pill); padding: 5px 14px; font-size: 12px; font-weight: 600; color: var(--text-secondary); cursor: pointer; font-family: var(--font-body);" style-hover="color: var(--brand-primary); border-color: var(--brand-primary);">{{copyBtnLabel}}</button>
+            </div>
+            <div style="border: 1px solid var(--border-subtle); background: var(--bg-surface-tint); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14px; color: var(--text-primary); line-height: 1.6;">{{orderMessage}}</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <button onClick="{{orderViaLine}}" style="display: block; width: 100%; text-align: center; background: #06C755; color: var(--white); font-family: var(--font-body); font-weight: 600; font-size: 15px; padding: 14px 20px; border-radius: var(--radius-pill); border: none; cursor: pointer;" style-hover="background: #05b34c;">{{t.orderLineCta}}</button>
+            <button onClick="{{orderViaIg}}" style="display: block; width: 100%; text-align: center; background: var(--white); color: var(--text-primary); font-family: var(--font-body); font-weight: 600; font-size: 15px; padding: 13px 20px; border-radius: var(--radius-pill); border: 1.5px solid var(--border-default); cursor: pointer;" style-hover="border-color: var(--brand-primary); color: var(--brand-primary);">{{t.orderIgCta}}</button>
+          </div>
+          <sc-if value="{{igCopied}}" hint-placeholder-val="{{false}}">
+            <div role="status" style="font-size: 13px; color: var(--coral-text); font-weight: 600; text-align: center;">{{t.orderIgCopied}}</div>
+          </sc-if>
+          <button onClick="{{closeOrder}}" style="background: none; border: none; font-family: var(--font-body); font-size: 14px; color: var(--text-secondary); cursor: pointer; padding: 2px; min-height: 44px;" style-hover="color: var(--text-primary);">{{t.orderCancel}}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;instagramHandle&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;cakeonstick&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Launch settings&quot;},&quot;contactEmail&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;cakeonstick2026@gmail.com&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Launch settings&quot;},&quot;lineId&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;@544zacuj&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Launch settings&quot;},&quot;showPrices&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Launch settings&quot;},&quot;language&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;auto&quot;,&quot;zh&quot;,&quot;en&quot;],&quot;default&quot;:&quot;auto&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Launch settings&quot;}}">
+const STRINGS = {
+  zh: {
+    navShop: "商品", navStory: "品牌故事", navProcess: "訂購流程", navFaq: "常見問題", navCta: "客製訂購",
+    heroTitle: "Sweet & Sticky",
+    navPackages: "派對套組",
+    heroBody: "手工製作蛋糕棒——送禮、慶祝、日常的小確幸。",
+    heroCtaPrimary: "開始客製訂購", heroCtaSecondary: "追蹤 Instagram",
+    heroNote: "訂購超簡單——IG 私訊、LINE，或填寫下方表單。不需註冊、不用線上結帳。",
+    badge1: "100% 純手工", badge2: "接單製作", badge3: "歡迎客製主題", badge4: "小批量高品質",
+    scheduleLead: "接單時間：每週四～週六。",
+    scheduleBody: "訂單於次週三製作並出貨。急單請另外私訊聯繫。",
+    setSlotPh: "拖曳商品照片到這裡",
+    orderFlavorsLabel: "套組內容",
+    shopEyebrow: "精選商品", shopTitle: "禮盒與日常甜點",
+    shopNoteA: "點選任一商品即可快速訂購——訊息幫你寫好，按送出就完成。也可以私訊", shopNoteB: "或加", shopNoteC: "聊聊。",
+    storyEyebrow: "品牌故事", storyTitle: "手工製作，用心出品",
+    storyP1: "Cake on Stick 源於一個簡單的想法：日常的甜點，也值得被用心對待。\n\n每一支蛋糕棒都由我們親手烘烤、裝飾與包裝，讓每一份禮物、每一次慶祝，以及每一個日常時刻，都變得更美好。",
+    storyP2: "因為每一份甜點的背後，都有一位值得珍惜的人。",
+    storyIgLink: "到 Instagram 看製作過程 →",
+    processEyebrow: "完全客製", processTitle: "說出你的想法，其他交給我們",
+    pkgEyebrow: "派對套組", pkgTitle: "主題派對套組",
+    pkgIntro: "預先設計好的主題套組——挑一個主題、選一個份量，其餘交給我們。",
+    pkgCta: "快速訂購", pkgSlotPh: "拖曳套組照片到這裡",
+    pkgSize15: "15 支裝", pkgSize21: "21 支裝", pkgSize30: "30 支裝",
+    pkgMoreA: "需要更多數量或特殊需求？", pkgMoreLink: "聯絡我們", pkgMoreB: "，為你報價。",
+    followEyebrow: "加入社群", followTitle: "幕後花絮、新口味，第一手看到",
+    followBody: "追蹤 Instagram、加入 LINE 好友——搶先看限定系列、接收開賣通知，以及幕後花絮。",
+    followCta: "追蹤我們的 IG",
+    faqEyebrow: "訂購須知", faqTitle: "下單前，先看看這些",
+    contactEyebrow: "聯絡我們", contactTitle: "說說你的慶祝計畫",
+    contactP1: "告訴我們主題、人數與日期——我們會回覆口味選擇、報價，以及包裝設計示意圖。",
+    contactP3: "訂單確認前不需付款——付款與取貨細節，我們會一起確認。",
+    formName: "姓名", formNamePh: "王小美", formDate: "活動日期",
+    formMessage: "告訴我們你的活動", formMessagePh: "主題、人數、口味⋯",
+    formSubmit: "送出需求",
+    formError: "請填寫姓名與有效的 Email，我們才能回覆你。",
+    formSuccess: "謝謝你！你的郵件程式應已開啟預先填好的訊息——按下傳送，我們會在 1–2 天內回覆。",
+    footerBlurb: "手工蛋糕棒、客製派對套組與禮盒——接單製作，用心出品。",
+    footerShopHead: "商品", footerGiftSets: "禮盒組", footerPackages: "派對套組", footerCustom: "客製訂購",
+    footerCompanyHead: "關於", footerContact: "聯絡我們",
+    footerFollowHead: "追蹤",
+    footerCopyright: "© 2026 Cake on Stick 版權所有",
+    orderHint: "訊息已經幫你寫好——選一個方式，按送出即可。",
+    orderMsgLabel: "你的訊息",
+    orderLineCta: "用 LINE 訂購",
+    orderIgCta: "用 IG 訂購",
+    orderIgCopied: "訊息已複製——在 IG 貼上送出即可。",
+    orderCancel: "取消",
+    copyBtn: "複製",
+    copiedBtn: "已複製 ✓",
+    followLineCta: "加 LINE 好友",
+    contactChannels: "選擇最方便的方式聯絡我們：",
+    contactIgBtn: "IG 私訊",
+    contactLineBtn: "加 LINE",
+    contactEmailBtn: "寄 Email",
+    nutritionEyebrow: "營養標示", nutritionTitle: "營養標示與過敏原資訊",
+    nutritionServingsLabel: "1 份",
+    nutritionCalories: "熱量", nutritionProtein: "蛋白質", nutritionFat: "脂肪",
+    nutritionSatFat: "飽和脂肪", nutritionTransFat: "反式脂肪", nutritionCarb: "碳水化合物",
+    nutritionSugar: "糖", nutritionSodium: "鈉",
+    allergenNote1: "本產品含有蛋類、奶類、大豆、麩質之穀物及其製品，不適合對其過敏體質者食用。",
+    allergenNote2: "本產品依客戶需求提供客製化服務，實際內容物成分、色調與裝飾配料將依個別訂單調整，請以實際出貨款式為準。",
+    nutritionPerServing: "每份", nutritionPer100g: "每100公克",
+    nutritionServingSize: "淨重：50公克 ± 5公克（單支）",
+    ingredientsLabel: "成分",
+    nutritionBack: "← 返回首頁",
+  },
+  en: {
+    navShop: "Shop", navStory: "Our Story", navProcess: "Process", navFaq: "FAQ", navCta: "Custom Order",
+    heroTitle: "Sweet & Sticky",
+    navPackages: "Party Packages",
+    heroBody: "Handmade cakesicles for gifting, celebrating, and everyday treats.",
+    heroCtaPrimary: "Start a Custom Order", heroCtaSecondary: "Follow on Instagram",
+    heroNote: "Ordering is easy — message us on Instagram or LINE, or send the form below. No checkout, no account.",
+    badge1: "100% Handmade", badge2: "Made to Order", badge3: "Custom Themes Welcome", badge4: "Small-Batch Quality",
+    scheduleLead: "Orders open Thursday–Saturday.",
+    scheduleBody: "Made fresh and shipped the following Wednesday. For rush orders, message us directly.",
+    setSlotPh: "Drop a product photo here",
+    orderFlavorsLabel: "What's in the set",
+    shopEyebrow: "Shop the Collection", shopTitle: "Gift sets & everyday treats",
+    shopNoteA: "Tap any set for quick order — we pre-write the message, you just hit send. Or DM", shopNoteB: "or reach us on", shopNoteC: ".",
+    storyEyebrow: "Our Story", storyTitle: "Made by hand, made with heart",
+    storyP1: "Cake on Stick started with a simple idea: everyday treats deserve to feel special.\n\nEvery cakesicle is baked, decorated, and packaged by hand, bringing a little sweetness to celebrations and everyday moments.",
+    storyP2: "Because every order is made for someone who matters.",
+    storyIgLink: "See the process on Instagram →",
+    processEyebrow: "Fully Customized", processTitle: "Tell us your theme — we'll do the rest",
+    pkgEyebrow: "Party Packages", pkgTitle: "Pre-designed themed packages",
+    pkgIntro: "Ready-designed themes — pick one, pick a size, and we'll handle the rest.",
+    pkgCta: "Quick Order", pkgSlotPh: "Drop a package photo here",
+    pkgSize15: "Set of 15", pkgSize21: "Set of 21", pkgSize30: "Set of 30",
+    pkgMoreA: "Need a larger order or something special?", pkgMoreLink: "Contact us", pkgMoreB: " for a quote.",
+    followEyebrow: "Join the Community", followTitle: "Behind-the-scenes, new flavors, first looks",
+    followBody: "Follow on Instagram and add us on LINE — first dibs on limited collections, launch updates, and behind-the-scenes moments.",
+    followCta: "Follow on Instagram",
+    faqEyebrow: "Good to Know", faqTitle: "A few things worth knowing before you order",
+    contactEyebrow: "Get in Touch", contactTitle: "Tell us about your celebration",
+    contactP1: "Share your theme, guest count, and date — we'll follow up with flavor options, pricing, and a mockup of your packaging.",
+    contactP3: "Nothing to pay until your order is confirmed — we'll sort out payment and pickup details together.",
+    formName: "Your Name", formNamePh: "Jane Doe", formDate: "Event Date",
+    formMessage: "Tell us about your event", formMessagePh: "Theme, guest count, flavors...",
+    formSubmit: "Send Request",
+    formError: "Please add your name and a valid email so we can reply.",
+    formSuccess: "Thanks! Your email app should have opened with your request — just hit send, and we'll be in touch within 1–2 days.",
+    footerBlurb: "Handmade cakesicles, custom party packages, and gift sets — made to order, made with heart.",
+    footerShopHead: "Shop", footerGiftSets: "Gift Sets", footerPackages: "Party Packages", footerCustom: "Custom Orders",
+    footerCompanyHead: "Company", footerContact: "Contact",
+    footerFollowHead: "Follow",
+    footerCopyright: "© 2026 Cake on Stick. All rights reserved.",
+    orderHint: "Your message is ready — pick a channel and hit send.",
+    orderMsgLabel: "Your message",
+    orderLineCta: "Order on LINE",
+    orderIgCta: "Order on Instagram",
+    orderIgCopied: "Message copied — paste it in the DM and send.",
+    orderCancel: "Cancel",
+    copyBtn: "Copy",
+    copiedBtn: "Copied ✓",
+    followLineCta: "Add us on LINE",
+    contactChannels: "Reach us whichever way is easiest:",
+    contactIgBtn: "DM on Instagram",
+    contactLineBtn: "Chat on LINE",
+    contactEmailBtn: "Email us",
+    nutritionEyebrow: "Nutrition Facts", nutritionTitle: "Nutrition Facts & Allergen Information",
+    nutritionServingsLabel: "1 serving",
+    nutritionCalories: "Calories", nutritionProtein: "Protein", nutritionFat: "Total Fat",
+    nutritionSatFat: "Saturated Fat", nutritionTransFat: "Trans Fat", nutritionCarb: "Total Carbohydrate",
+    nutritionSugar: "Total Sugars", nutritionSodium: "Sodium",
+    allergenNote1: "Contains egg, milk, soy, and wheat (gluten) products — not suitable for those with related allergies.",
+    allergenNote2: "Custom orders are made to each customer's request; actual ingredients, coloring, and decorations may vary by order.",
+    nutritionPerServing: "Per Serving", nutritionPer100g: "Per 100 g",
+    nutritionServingSize: "Net Weight: 50 g ± 5 g (per piece)",
+    ingredientsLabel: "Ingredients",
+    nutritionBack: "← Back to Home",
+  },
+};
+
+const NUTRITION = {
+  zh: [
+    { key: "vanilla", name: "Vanilla 香草", servingCal: "203.3 大卡", per100Cal: "406.6 大卡", servingProtein: "2.4 公克", per100Protein: "4.8 公克", servingFat: "10.3 公克", per100Fat: "20.6 公克", servingSatFat: "7.3 公克", per100SatFat: "14.6 公克", servingTransFat: "0.0 公克", per100TransFat: "0.0 公克", servingCarb: "24.7 公克", per100Carb: "49.4 公克", servingSugar: "15.8 公克", per100Sugar: "31.6 公克", servingSodium: "120.8 毫克", per100Sodium: "241.6 毫克", ingredients: "白巧克力風味鈕、水、低筋麵粉、白砂糖、大豆沙拉油、雞蛋、全脂奶粉、濃縮香草莢醬、泡打粉、小蘇打粉、鹽。" },
+    { key: "chocolate", name: "Chocolate 巧克力", servingCal: "190.8 大卡", per100Cal: "381.6 大卡", servingProtein: "3.0 公克", per100Protein: "6.0 公克", servingFat: "10.1 公克", per100Fat: "20.2 公克", servingSatFat: "6.3 公克", per100SatFat: "12.6 公克", servingTransFat: "0.0 公克", per100TransFat: "0.0 公克", servingCarb: "22.2 公克", per100Carb: "44.4 公克", servingSugar: "15.0 公克", per100Sugar: "30.0 公克", servingSodium: "95.8 毫克", per100Sodium: "191.6 毫克", ingredients: "深黑巧克力風味鈕扣、水、低筋麵粉、白砂糖、大豆沙拉油、高脂可可粉、雞蛋、全脂奶粉、香草精、泡打粉、小蘇打粉、咖啡粉、牛奶風味巧克力鈕扣、鹽。" },
+    { key: "redvelvet", name: "Red Velvet 紅絲絨", servingCal: "190.0 大卡", per100Cal: "380.0 大卡", servingProtein: "2.5 公克", per100Protein: "5.0 公克", servingFat: "10.3 公克", per100Fat: "20.6 公克", servingSatFat: "7.2 公克", per100SatFat: "14.4 公克", servingTransFat: "0.0 公克", per100TransFat: "0.0 公克", servingCarb: "21.8 公克", per100Carb: "43.6 公克", servingSugar: "15.4 公克", per100Sugar: "30.8 公克", servingSodium: "104.2 毫克", per100Sodium: "208.4 毫克", ingredients: "白巧克力風味鈕扣、水、低筋麵粉、白砂糖、大豆沙拉油、雞蛋、高脂可可粉、全脂奶粉、香草精、泡打粉、小蘇打粉、白醋、檸檬酸、鹽、咖啡粉、食用紅色色素。" },
+  ],
+  en: [
+    { key: "vanilla", name: "Vanilla", servingCal: "203.3 kcal", per100Cal: "406.6 kcal", servingProtein: "2.4 g", per100Protein: "4.8 g", servingFat: "10.3 g", per100Fat: "20.6 g", servingSatFat: "7.3 g", per100SatFat: "14.6 g", servingTransFat: "0.0 g", per100TransFat: "0.0 g", servingCarb: "24.7 g", per100Carb: "49.4 g", servingSugar: "15.8 g", per100Sugar: "31.6 g", servingSodium: "120.8 mg", per100Sodium: "241.6 mg", ingredients: "White chocolate-flavored buttons, water, cake flour, sugar, soybean oil, egg, whole milk powder, vanilla bean paste, baking powder, baking soda, salt." },
+    { key: "chocolate", name: "Chocolate", servingCal: "190.8 kcal", per100Cal: "381.6 kcal", servingProtein: "3.0 g", per100Protein: "6.0 g", servingFat: "10.1 g", per100Fat: "20.2 g", servingSatFat: "6.3 g", per100SatFat: "12.6 g", servingTransFat: "0.0 g", per100TransFat: "0.0 g", servingCarb: "22.2 g", per100Carb: "44.4 g", servingSugar: "15.0 g", per100Sugar: "30.0 g", servingSodium: "95.8 mg", per100Sodium: "191.6 mg", ingredients: "Dark chocolate-flavored buttons, water, cake flour, sugar, soybean oil, high-fat cocoa powder, egg, whole milk powder, vanilla extract, baking powder, baking soda, coffee powder, milk chocolate-flavored buttons, salt." },
+    { key: "redvelvet", name: "Red Velvet", servingCal: "190.0 kcal", per100Cal: "380.0 kcal", servingProtein: "2.5 g", per100Protein: "5.0 g", servingFat: "10.3 g", per100Fat: "20.6 g", servingSatFat: "7.2 g", per100SatFat: "14.4 g", servingTransFat: "0.0 g", per100TransFat: "0.0 g", servingCarb: "21.8 g", per100Carb: "43.6 g", servingSugar: "15.4 g", per100Sugar: "30.8 g", servingSodium: "104.2 mg", per100Sodium: "208.4 mg", ingredients: "White chocolate-flavored buttons, water, cake flour, sugar, soybean oil, egg, high-fat cocoa powder, whole milk powder, vanilla extract, baking powder, baking soda, white vinegar, citric acid, salt, coffee powder, red food coloring." },
+  ],
+};
+
+const PRODUCTS = {
+  zh: [
+    { slotId: "set-classic", name: "經典組", price: "NT$400／組", badge: "",
+      flavors: [
+        { name: "經典巧克力", desc: "黑巧克力外衣，巧克力淋面" },
+        { name: "香草", desc: "白巧克力外衣，經典淋面" },
+        { name: "紅絲絨", desc: "白巧克力外衣，經典淋面" },
+      ] },
+    { slotId: "set-single", name: "單一口味組", price: "NT$400／組", badge: "",
+      slides: [
+        { slotId: "set-single-chocolate", placeholder: "經典巧克力照片" },
+        { slotId: "set-single-vanilla", placeholder: "香草照片" },
+        { slotId: "set-single-redvelvet", placeholder: "紅絲絨照片" },
+      ],
+      flavors: [
+        { name: "單一口味", desc: "三支同口味——經典巧克力、香草或紅絲絨任選一種" },
+      ] },
+    { slotId: "set-birthday", name: "生日禮盒", price: "NT$450／組", badge: "",
+      flavors: [
+        { name: "經典巧克力", desc: "彩色淋面與糖粒" },
+        { name: "香草", desc: "繽紛糖珠，派對配色" },
+        { name: "紅絲絨", desc: "生日主題手繪裝飾" },
+      ] },
+    { image: "assets/photography/love-set.png", name: "愛的禮盒", price: "NT$450／組", badge: "",
+      flavors: [
+        { name: "紅絲絨", desc: "白巧克力外衣，愛心裝飾" },
+        { name: "經典巧克力", desc: "草莓淋面，「I ♥ U」字樣" },
+        { name: "香草", desc: "粉紅外衣，手繪愛心" },
+      ] },
+    { image: "assets/photography/baby-girl-newborn.png", name: "女寶寶彌月禮盒", price: "NT$450／組", badge: "",
+      flavors: [
+        { name: "紅絲絨", desc: "粉紅外衣，「BABY」字樣" },
+        { name: "香草", desc: "白巧克力外衣，粉色點綴" },
+        { name: "經典巧克力", desc: "奶油色外衣，小花裝飾" },
+      ] },
+    { image: "assets/photography/baby-boy-newborn.png", name: "男寶寶彌月禮盒", price: "NT$450／組", badge: "",
+      flavors: [
+        { name: "經典巧克力", desc: "粉藍外衣，「BABY」字樣" },
+        { name: "香草", desc: "白巧克力外衣，藍色點綴" },
+        { name: "紅絲絨", desc: "淺藍淋面裝飾" },
+      ] },
+    { slotId: "set-friend", name: "You've Got a Friend", price: "NT$450／組", badge: "",
+      flavors: [
+        { name: "香草", desc: "牛仔帽主題手繪裝飾" },
+        { name: "經典巧克力", desc: "太空人配色" },
+        { name: "紅絲絨", desc: "綠色小怪物造型裝飾" },
+      ] },
+  ],
+  en: [
+    { slotId: "set-classic", name: "Classic Set", price: "NT$400 / set", badge: "",
+      flavors: [
+        { name: "Classic Chocolate", desc: "dark chocolate shell, chocolate drizzle" },
+        { name: "Vanilla", desc: "white chocolate shell, classic drizzle" },
+        { name: "Red Velvet", desc: "white chocolate shell, classic drizzle" },
+      ] },
+    { slotId: "set-single", name: "Single Flavor Set", price: "NT$400 / set", badge: "",
+      slides: [
+        { slotId: "set-single-chocolate", placeholder: "Classic Chocolate photo" },
+        { slotId: "set-single-vanilla", placeholder: "Vanilla photo" },
+        { slotId: "set-single-redvelvet", placeholder: "Red Velvet photo" },
+      ],
+      flavors: [
+        { name: "One flavor", desc: "three of the same — choose Classic Chocolate, Vanilla, or Red Velvet" },
+      ] },
+    { slotId: "set-birthday", name: "Birthday Set", price: "NT$450 / set", badge: "",
+      flavors: [
+        { name: "Classic Chocolate", desc: "colorful drizzle & sprinkles" },
+        { name: "Vanilla", desc: "rainbow sprinkles, party colors" },
+        { name: "Red Velvet", desc: "hand-piped birthday details" },
+      ] },
+    { image: "assets/photography/love-set.png", name: "Love Set", price: "NT$450 / set", badge: "",
+      flavors: [
+        { name: "Red Velvet", desc: "white chocolate shell, heart details" },
+        { name: "Classic Chocolate", desc: "strawberry drizzle, \"I ♥ U\" lettering" },
+        { name: "Vanilla", desc: "pink shell, hand-piped hearts" },
+      ] },
+    { image: "assets/photography/baby-girl-newborn.png", name: "Baby Girl Newborn Set", price: "NT$450 / set", badge: "",
+      flavors: [
+        { name: "Red Velvet", desc: "pink shell, \"BABY\" lettering" },
+        { name: "Vanilla", desc: "white chocolate shell, pink accents" },
+        { name: "Classic Chocolate", desc: "cream shell, floral details" },
+      ] },
+    { image: "assets/photography/baby-boy-newborn.png", name: "Baby Boy Newborn Set", price: "NT$450 / set", badge: "",
+      flavors: [
+        { name: "Classic Chocolate", desc: "baby-blue shell, \"BABY\" lettering" },
+        { name: "Vanilla", desc: "white chocolate shell, blue accents" },
+        { name: "Red Velvet", desc: "light-blue drizzle" },
+      ] },
+    { slotId: "set-friend", name: "You've Got a Friend Set", price: "NT$450 / set", badge: "",
+      flavors: [
+        { name: "Vanilla", desc: "cowboy hat hand-piped details" },
+        { name: "Classic Chocolate", desc: "spaceman-inspired colors" },
+        { name: "Red Velvet", desc: "little green alien design" },
+      ] },
+  ],
+};
+
+const PACKAGES = {
+  zh: [
+    { slotId: "pkg-toy-story", name: "You've Got a Friend", sizes: "15／21／30 支", isPackage: true },
+    { slotId: "pkg-birthday", name: "生日", sizes: "15／21／30 支", isPackage: true },
+    { slotId: "pkg-baby-shower", name: "寶寶", sizes: "15／21／30 支", isPackage: true },
+    { slotId: "pkg-wedding", name: "婚禮", sizes: "15／21／30 支", isPackage: true },
+    { slotId: "pkg-gender-reveal", name: "性別揭曉", sizes: "15／21／30 支", isPackage: true },
+  ],
+  en: [
+    { slotId: "pkg-toy-story", name: "You've Got a Friend", sizes: "15, 21, or 30 pieces", isPackage: true },
+    { slotId: "pkg-birthday", name: "Birthday", sizes: "15, 21, or 30 pieces", isPackage: true },
+    { slotId: "pkg-baby-shower", name: "Baby Shower", sizes: "15, 21, or 30 pieces", isPackage: true },
+    { slotId: "pkg-wedding", name: "Wedding", sizes: "15, 21, or 30 pieces", isPackage: true },
+    { slotId: "pkg-gender-reveal", name: "Gender Reveal", sizes: "15, 21, or 30 pieces", isPackage: true },
+  ],
+};
+
+const STEPS = {
+  zh: [
+    { n: 1, title: "分享你的想法", body: "告訴我們主題、色系與場合——生日、寶寶派對、婚禮或品牌活動。" },
+    { n: 2, title: "我們設計提案", body: "我們依你的想法設計，回覆口味選項與提案讓你挑選。" },
+    { n: 3, title: "手工製作交付", body: "每一支蛋糕棒都手工烘烤、沾裹、裝飾與包裝，可自取或外送。" },
+  ],
+  en: [
+    { n: 1, title: "Share Your Vision", body: "Tell us the theme, palette, and occasion — birthdays, showers, weddings, or brand events." },
+    { n: 2, title: "We Design", body: "We design around your idea and come back with flavor options and a packaging proposal for you to choose from." },
+    { n: 3, title: "Handmade & Delivered", body: "Every cakesicle is baked, dipped, decorated, and packaged by hand for pickup or delivery." },
+  ],
+};
+
+const FAQS = {
+  zh: [
+    { q: "怎麼訂購、怎麼付款？", a: "這裡沒有線上結帳，直接 IG 私訊、加 LINE，或填寫下方表單即可。細節一起確認後，再以轉帳付款。確認前完全不需付費。" },
+    { q: "需要提前多久下單？", a: "我們每週四至週六接單，於次週三製作並出貨。客製訂單與派對套組，建議在活動前 1 至 2 週聯繫，節日前後請盡早。若是婚禮或大型活動，歡迎提早預約，支付 30% 訂金即可確認檔期。" },
+    { q: "運費怎麼算？可以自取嗎？", a: "全台宅配運費 NT$190（冷藏配送），滿 NT$3,000 免運。自取方式尚在規劃中，確定後會另行公告。" },
+    { q: "可以指定完全客製的主題或設計嗎？", a: "歡迎客製，實際可行度會依蛋糕棒的呈現方式而定。跟我們聊聊你的想法，我們一起看看能做到什麼程度。" },
+  ],
+  en: [
+    { q: "How do I order and pay?", a: "No online checkout here. Just DM us on Instagram, message us on LINE, or send the form below. We'll confirm the details together, and payment is a simple money transfer once your order is locked in. Nothing to pay up front." },
+    { q: "How far in advance should I order?", a: "We take orders every Thursday through Saturday, then make and ship everything the following Wednesday. For custom orders and party packages, reach out 1 to 2 weeks ahead of your event, especially around holidays. For weddings or larger events, feel free to reach out well in advance to book your date. A 30% deposit secures it." },
+    { q: "What about shipping and pickup?", a: "We ship cold anywhere in Taiwan for NT$190, free over NT$3,000. Pickup options are still being finalized, so stay tuned." },
+    { q: "Can I request a fully custom theme or design?", a: "Custom themes are always welcome. What's possible depends on how well it translates onto a small cakesicle, so just tell us your idea and we'll see what we can do together." },
+  ],
+};
+
+function loadPublished() {
+  try { return JSON.parse(localStorage.getItem("cos-published-content")) || {}; } catch (e) { return {}; }
+}
+
+class Component extends DCLogic {
+  state = {
+    ov: loadPublished(),
+    lang: (typeof localStorage !== "undefined" && localStorage.getItem("cos-lang")) || "zh",
+    submitted: false,
+    formError: false,
+    name: "",
+    email: "",
+    date: "",
+    message: "",
+    windowWidth: typeof window !== "undefined" ? window.innerWidth : 1280,
+    mobileNavOpen: false,
+    openFaqIndex: 0,
+    orderProduct: null,
+    igCopied: false,
+    msgCopied: false,
+  };
+
+  componentDidMount() {
+    this._onResize = () => this.setState({ windowWidth: window.innerWidth });
+    window.addEventListener("resize", this._onResize);
+    this._onStorage = (e) => { if (!e.key || e.key === "cos-published-content") this.setState({ ov: loadPublished() }); };
+    window.addEventListener("storage", this._onStorage);
+    // Esc closes the quick-order dialog, or the mobile menu
+    this._onKey = (e) => {
+      if (e.key !== "Escape") return;
+      if (this.state.orderProduct) this.closeOrder();
+      else if (this.state.mobileNavOpen) this.setState({ mobileNavOpen: false });
+    };
+    window.addEventListener("keydown", this._onKey);
+    this.autoDetectLanguage();
+    document.documentElement.lang = this.state.lang === "zh" ? "zh-Hant-TW" : "en";
+    if (window.location.hash === "#nutrition") {
+      setTimeout(() => this.scrollToId("nutrition"), 300);
+    }
+  }
+
+  componentDidUpdate() {
+    // Keep the page behind the quick-order dialog from scrolling
+    document.body.style.overflow = this.state.orderProduct ? "hidden" : "";
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this._onResize);
+    window.removeEventListener("storage", this._onStorage);
+    window.removeEventListener("keydown", this._onKey);
+    document.body.style.overflow = "";
+  }
+
+  autoDetectLanguage() {
+    // Explicit user choice always wins
+    if (typeof localStorage !== "undefined" && localStorage.getItem("cos-lang")) return;
+    const forced = this.props.language ?? "auto";
+    if (forced !== "auto") { this.applyLang(forced, false); return; }
+    // 1) Browser language hint (instant)
+    const langs = (navigator.languages || [navigator.language || ""]).map((l) => l.toLowerCase());
+    const hasZh = langs.some((l) => l.startsWith("zh"));
+    this.applyLang(hasZh ? "zh" : "en", false);
+    // 2) IP geolocation refinement (async, only if no explicit choice yet)
+    fetch("https://ipapi.co/json/")
+      .then((r) => r.json())
+      .then((geo) => {
+        if (typeof localStorage !== "undefined" && localStorage.getItem("cos-lang")) return;
+        if (geo && geo.country_code) {
+          this.applyLang(geo.country_code === "TW" ? "zh" : (hasZh ? "zh" : "en"), false);
+        }
+      })
+      .catch(() => {});
+  }
+
+  applyLang(lang, persist) {
+    this.setState({ lang: lang });
+    if (persist && typeof localStorage !== "undefined") localStorage.setItem("cos-lang", lang);
+    document.documentElement.lang = lang === "zh" ? "zh-Hant-TW" : "en";
+  }
+
+  ovSettings() {
+    return (this.state.ov && this.state.ov.settings) || {};
+  }
+
+  getHandle() {
+    const raw = this.ovSettings().instagramHandle || this.props.instagramHandle || "cakeonstick";
+    return raw.replace(/^@/, "");
+  }
+
+  getLineId() {
+    return this.ovSettings().lineId || this.props.lineId || "@544zacuj";
+  }
+
+  orderMessage(p) {
+    if (p.isPackage) {
+      return this.state.lang === "zh"
+        ? "你好！我想訂購「" + p.name + "」主題派對套組（" + p.sizes + "），想了解內容與價格。謝謝！"
+        : "Hi! I'm interested in the " + p.name + " party package (" + p.sizes + ") — could you share details and pricing? Thanks!";
+    }
+    return this.state.lang === "zh"
+      ? "你好！我想訂購「" + p.name + "」（" + p.priceDisplay + "）。請問取貨方式怎麼安排呢？謝謝！"
+      : "Hi! I'd like to order the " + p.name + " (" + p.priceDisplay + "). How can I arrange pickup or delivery? Thanks!";
+  }
+
+  openOrder = (p) => this.setState({ orderProduct: p, igCopied: false });
+
+  closeOrder = () => this.setState({ orderProduct: null, igCopied: false });
+
+  isMobileDevice() {
+    return /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  }
+
+  openLineUri = (path) => {
+    if (this.isMobileDevice()) {
+      window.open("https://line.me/R/" + path, "_blank", "noopener");
+      return;
+    }
+    // Desktop: try the LINE desktop app first, fall back to the web link
+    window.location.href = "line://" + path;
+    setTimeout(() => {
+      if (!document.hidden) window.open("https://line.me/R/" + path, "_blank", "noopener");
+    }, 1500);
+  };
+
+  orderViaLine = () => {
+    const op = this.state.orderProduct;
+    if (!op) return;
+    this.openLineUri("oaMessage/" + encodeURIComponent(this.getLineId()) + "/?" + encodeURIComponent(this.orderMessage(op)));
+  };
+
+  openLineAdd = () => this.openLineUri("ti/p/" + encodeURIComponent(this.getLineId()));
+
+  lineLinkClick = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    this.setState({ mobileNavOpen: false });
+    this.openLineAdd();
+  };
+
+  copyMessage = () => {
+    const op = this.state.orderProduct;
+    if (op && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(this.orderMessage(op)).catch(() => {});
+    }
+    this.setState({ msgCopied: true });
+    clearTimeout(this._copyT);
+    this._copyT = setTimeout(() => this.setState({ msgCopied: false }), 2000);
+  };
+
+  getEmail() {
+    return this.ovSettings().contactEmail || this.props.contactEmail || "cakeonstick2026@gmail.com";
+  }
+
+  openEmail = () => {
+    window.location.href = "mailto:" + this.getEmail();
+  };
+
+  orderViaIg = () => {
+    const op = this.state.orderProduct;
+    if (op && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(this.orderMessage(op)).catch(() => {});
+    }
+    window.open("https://ig.me/m/" + this.getHandle(), "_blank", "noopener");
+    this.setState({ igCopied: true });
+  };
+
+  handleSubmit = () => {
+    const { name, email, date, message, lang } = this.state;
+    if (!name.trim() || !email.trim() || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email.trim())) {
+      this.setState({ formError: true, submitted: false });
+      return;
+    }
+    const to = this.getEmail();
+    const subject = (lang === "zh" ? "客製訂購需求 — " : "Custom order request — ") + name.trim();
+    const bodyLines = [
+      (lang === "zh" ? "姓名：" : "Name: ") + name.trim(),
+      "Email: " + email.trim(),
+      date ? (lang === "zh" ? "活動日期：" : "Event date: ") + date : "",
+      "",
+      message.trim() || (lang === "zh" ? "（未填寫活動細節）" : "(No event details provided)"),
+    ].filter((l, i) => l !== "" || i === 3);
+    window.location.href = "mailto:" + to + "?subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(bodyLines.join("\n"));
+    this.setState({ submitted: true, formError: false });
+  };
+
+  toggleFaq = (i) => this.setState((s) => ({ openFaqIndex: s.openFaqIndex === i ? null : i }));
+
+  toggleMobileNav = () => this.setState((s) => ({ mobileNavOpen: !s.mobileNavOpen }));
+
+  openInstagram = () => {
+    window.open("https://instagram.com/" + this.getHandle(), "_blank", "noopener");
+  };
+
+  scrollToId = (id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - 96;
+    window.scrollTo({ top: Math.max(y, 0), behavior: "smooth" });
+  };
+
+  goTo = (id) => (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    this.setState({ mobileNavOpen: false });
+    this.scrollToId(id);
+  };
+
+  goTop = (e) => {
+    if (e && e.preventDefault) e.preventDefault();
+    this.setState({ mobileNavOpen: false });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  renderVals() {
+    // The header collapses to the menu button below 1240px: the full English nav
+    // needs about 1100px, so it overflowed on smaller laptops. The quick-order
+    // dialog becomes a bottom sheet below 960px.
+    const navDesktop = this.state.windowWidth >= 1240;
+    const isNarrow = this.state.windowWidth < 960;
+    const navOpen = this.state.mobileNavOpen && !navDesktop;
+    const handle = this.getHandle();
+    const lang = this.state.lang;
+    const ov = this.state.ov || {};
+    const t = { ...STRINGS[lang], ...((ov.strings || {})[lang] || {}) };
+    const pOv = (ov.products || {})[lang] || [];
+    const kOv = (ov.packages || {})[lang] || [];
+    const fOv = (ov.faqs || {})[lang] || [];
+    const sOv = ov.settings || {};
+    const showPrices = sOv.showPrices !== undefined ? sOv.showPrices : (this.props.showPrices ?? true);
+    const dmForPricing = lang === "zh" ? "私訊詢價" : "DM for pricing";
+    const lineId = this.getLineId();
+    const op = this.state.orderProduct;
+    const orderMsg = op ? this.orderMessage(op) : "";
+    return {
+      namespace: "CakeOnStickDesignSystem_a9f058",
+      t: t,
+      igHandle: "@" + handle,
+      igUrl: "https://instagram.com/" + handle,
+      setZh: () => this.applyLang("zh", true),
+      setEn: () => this.applyLang("en", true),
+      zhBg: lang === "zh" ? "var(--charcoal-700)" : "var(--white)",
+      zhColor: lang === "zh" ? "var(--white)" : "var(--text-secondary)",
+      enBg: lang === "en" ? "var(--charcoal-700)" : "var(--white)",
+      enColor: lang === "en" ? "var(--white)" : "var(--text-secondary)",
+      zhPressed: lang === "zh" ? "true" : "false",
+      enPressed: lang === "en" ? "true" : "false",
+      isMobile: !navDesktop,
+      isDesktop: navDesktop,
+      mobileNavOpen: navOpen,
+      mobileNavIcon: navOpen ? "✕" : "☰",
+      menuLabel: lang === "zh" ? (navOpen ? "關閉選單" : "開啟選單") : (navOpen ? "Close menu" : "Open menu"),
+      menuExpanded: navOpen ? "true" : "false",
+      prevLabel: lang === "zh" ? "上一張照片" : "Previous photo",
+      nextLabel: lang === "zh" ? "下一張照片" : "Next photo",
+      pkgPrice15: showPrices ? "NT$2,200" : dmForPricing,
+      pkgPrice21: showPrices ? "NT$2,900" : dmForPricing,
+      pkgPrice30: showPrices ? "NT$3,999" : dmForPricing,
+      toggleMobileNav: this.toggleMobileNav,
+      goShop: this.goTo("shop"),
+      goPackages: this.goTo("packages"),
+      packages: PACKAGES[lang].map((k, i) => {
+        k = { ...k, ...(kOv[i] || {}) };
+        const mapped = { ...k, priceDisplay: k.sizes, hasBadge: false };
+        mapped.openOrder = () => this.openOrder(mapped);
+        const slides = k.slotId === "pkg-gender-reveal" ? [
+          { slotId: "pkg-gender-reveal", placeholder: lang === "zh" ? "外觀照片" : "Outside photo" },
+          { slotId: "pkg-gender-reveal-inside", placeholder: lang === "zh" ? "內部揭曉照片" : "Inside — the reveal" },
+        ] : null;
+        mapped.isCarousel = !!slides;
+        mapped.isSingle = !slides;
+        if (slides) {
+          const cur = (this.state.pkgSlide || {})[k.slotId] || 0;
+          const set = (n) => this.setState(st => ({ pkgSlide: { ...(st.pkgSlide || {}), [k.slotId]: (n + slides.length) % slides.length } }));
+          mapped.slides = slides;
+          mapped.slideOffset = "-" + (cur * 100) + "%";
+          mapped.prevSlide = (e) => { e && e.stopPropagation(); set(cur - 1); };
+          mapped.nextSlide = (e) => { e && e.stopPropagation(); set(cur + 1); };
+          mapped.dots = slides.map((s, j) => ({
+            label: (lang === "zh" ? "照片 " : "Photo ") + (j + 1),
+            bg: j === cur ? "var(--white)" : "rgba(255,255,255,0.5)",
+            go: (e) => { e && e.stopPropagation(); set(j); },
+          }));
+        }
+        return mapped;
+      }),
+      goStory: this.goTo("story"),
+      goProcess: this.goTo("process"),
+      goFaq: this.goTo("faq"),
+      goContact: this.goTo("contact"),
+      goNutrition: this.goTo("nutrition"),
+      goTop: this.goTop,
+      openInstagram: this.openInstagram,
+      products: PRODUCTS[lang].map((p, i) => {
+        p = { ...p, ...(pOv[i] || {}) };
+        p = { ...p, hasPhoto: !!p.image, noPhoto: !p.image, hasBadge: !!p.badge };
+        const mapped = { ...p, priceDisplay: showPrices ? p.price : dmForPricing };
+        mapped.openOrder = () => this.openOrder(mapped);
+        mapped.isCarousel = !!(p.slides && p.slides.length);
+        mapped.isSingle = !mapped.isCarousel;
+        mapped.showSlot = mapped.noPhoto && mapped.isSingle;
+        mapped.showCarousel = mapped.noPhoto && mapped.isCarousel;
+        if (mapped.isCarousel) {
+          const n = p.slides.length;
+          const cur = (this.state.pkgSlide || {})[p.slotId] || 0;
+          const set = (j) => this.setState(st => ({ pkgSlide: { ...(st.pkgSlide || {}), [p.slotId]: (j + n) % n } }));
+          mapped.slideOffset = "-" + (cur * 100) + "%";
+          mapped.prevSlide = (e) => { e && e.stopPropagation(); set(cur - 1); };
+          mapped.nextSlide = (e) => { e && e.stopPropagation(); set(cur + 1); };
+          mapped.dots = p.slides.map((s, j) => ({
+            label: (lang === "zh" ? "照片 " : "Photo ") + (j + 1),
+            bg: j === cur ? "var(--white)" : "rgba(255,255,255,0.5)",
+            go: (e) => { e && e.stopPropagation(); set(j); },
+          }));
+        }
+        return mapped;
+      }),
+      lineAddUrl: "https://line.me/R/ti/p/" + encodeURIComponent(lineId),
+      lineIdDisplay: lineId,
+      orderModalOpen: !!op,
+      orderName: op ? op.name : "",
+      orderPrice: op ? op.priceDisplay : "",
+      orderImage: op && op.image ? op.image : "",
+      orderHasImage: !!(op && op.image),
+      orderHasFlavors: !!(op && op.flavors && op.flavors.length),
+      orderFlavors: op && op.flavors ? op.flavors : [],
+      orderMessage: orderMsg,
+      closeOrder: this.closeOrder,
+      orderViaIg: this.orderViaIg,
+      orderViaLine: this.orderViaLine,
+      openLineAdd: this.openLineAdd,
+      lineLinkClick: this.lineLinkClick,
+      openEmail: this.openEmail,
+      copyMessage: this.copyMessage,
+      copyBtnLabel: this.state.msgCopied ? t.copiedBtn : t.copyBtn,
+      modalAlign: isNarrow ? "flex-end" : "center",
+      modalPad: isNarrow ? "0" : "20px",
+      modalRadius: isNarrow ? "22px 22px 0 0" : "var(--radius-lg)",
+      stopProp: (e) => e.stopPropagation(),
+      igCopied: this.state.igCopied,
+      steps: STEPS[lang],
+      faqs: FAQS[lang].map((f, i) => ({ ...f, ...(fOv[i] || {}) })).concat(fOv.slice(FAQS[lang].length).filter((x) => x && x.q)).map((f, i) => ({
+        q: f.q,
+        a: f.a,
+        isOpen: this.state.openFaqIndex === i,
+        expanded: this.state.openFaqIndex === i ? "true" : "false",
+        indicator: this.state.openFaqIndex === i ? "−" : "+",
+        toggle: () => this.toggleFaq(i),
+      })),
+      nameVal: this.state.name,
+      emailVal: this.state.email,
+      dateVal: this.state.date,
+      messageVal: this.state.message,
+      onNameChange: (e) => this.setState({ name: e.target.value }),
+      onEmailChange: (e) => this.setState({ email: e.target.value }),
+      onDateChange: (e) => this.setState({ date: e.target.value }),
+      onMessageChange: (e) => this.setState({ message: e.target.value }),
+      submitted: this.state.submitted,
+      formError: this.state.formError,
+      handleSubmit: this.handleSubmit,
+      nutritionFacts: NUTRITION[lang],
+    };
+  }
+}
+</script>
+</body>
+</html>

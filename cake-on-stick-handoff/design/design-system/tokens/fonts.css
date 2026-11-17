@@ -1,0 +1,5 @@
+/* Cake on Stick — Web fonts
+   No brand font files were provided, so we load the closest Google Fonts match
+   (Poppins for display/wordmark, Inter for body). Swap these @font-face-equivalent
+   imports for real hosted files the moment brand fonts are supplied. */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap");

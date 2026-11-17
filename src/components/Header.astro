@@ -1,0 +1,70 @@
+---
+import { Image } from 'astro:assets';
+import logoMark from '../assets/logo/logo-black-icon.png';
+import type { Lang, Strings } from '../content/types';
+import { homePath, links } from '../lib/site';
+import { settings } from '../content/settings';
+import Button from './Button.astro';
+
+interface Props {
+  lang: Lang;
+  t: Strings;
+}
+const { lang, t } = Astro.props;
+const sections = [
+  { href: '#shop', label: t.navShop },
+  { href: '#packages', label: t.navPackages },
+  { href: '#story', label: t.navStory },
+  { href: '#process', label: t.navProcess },
+  { href: '#faq', label: t.navFaq },
+];
+---
+
+<header class="site-header">
+  <div class="header-bar">
+    <a class="brand" href="#">
+      <Image src={logoMark} alt="" width={72} height={40} densities={[1, 2, 3]} loading="eager" />
+      <span>Cake on Stick</span>
+    </a>
+
+    <nav class="nav-desktop" aria-label={t.navShop}>
+      {sections.map((s) => <a href={s.href}>{s.label}</a>)}
+    </nav>
+    <div class="header-actions">
+      <div class="lang-toggle">
+        <a href={homePath('zh')} lang="zh-Hant-TW" hreflang="zh-Hant-TW" data-lang="zh" aria-current={lang === 'zh' ? 'true' : undefined}>中文</a>
+        <a href={homePath('en')} lang="en" hreflang="en" data-lang="en" aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
+      </div>
+      <a class="social" href={links.igUrl} target="_blank" rel="noopener">Instagram</a>
+      <a class="social is-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line={links.lineAddPath}>LINE</a>
+      <Button variant="primary" size="sm" href="#contact">{t.navCta}</Button>
+    </div>
+
+    <div class="header-mobile">
+      <div class="lang-toggle">
+        <a href={homePath('zh')} lang="zh-Hant-TW" hreflang="zh-Hant-TW" data-lang="zh" aria-current={lang === 'zh' ? 'true' : undefined}>中文</a>
+        <a href={homePath('en')} lang="en" hreflang="en" data-lang="en" aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
+      </div>
+      <button
+        class="menu-button"
+        type="button"
+        aria-label={t.menuOpen}
+        aria-expanded="false"
+        aria-controls="mobile-nav"
+        data-menu-button
+        data-label-open={t.menuOpen}
+        data-label-close={t.menuClose}>☰</button
+      >
+    </div>
+  </div>
+
+  <nav class="mobile-nav" id="mobile-nav" aria-label={t.menuOpen} hidden>
+    {sections.map((s) => <a href={s.href}>{s.label}</a>)}
+    <a href="#nutrition">{t.nutritionEyebrow}</a>
+    <a class="is-ig" href={links.igUrl} target="_blank" rel="noopener">Instagram {links.igHandle}</a>
+    <a class="is-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line={links.lineAddPath}>LINE {settings.lineId}</a>
+    <div class="cta">
+      <Button variant="primary" size="lg" href="#contact">{t.heroCtaPrimary}</Button>
+    </div>
+  </nav>
+</header>

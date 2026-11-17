@@ -1,0 +1,48 @@
+---
+import { Image } from 'astro:assets';
+import logoWhite from '../assets/logo/logo-white.png';
+import type { Strings } from '../content/types';
+import { settings } from '../content/settings';
+import { links } from '../lib/site';
+
+interface Props {
+  t: Strings;
+}
+const { t } = Astro.props;
+---
+
+<footer class="site-footer on-dark">
+  <div class="footer-inner">
+    <div class="footer-cols">
+      <div>
+        <Image src={logoWhite} alt="Cake on Stick" width={170} densities={[1, 2, 3]} class="footer-logo" loading="lazy" />
+        <p class="footer-blurb">{t.footerBlurb}</p>
+      </div>
+      <nav aria-label={t.footerShopHead}>
+        <p class="footer-head">{t.footerShopHead}</p>
+        <div class="footer-links">
+          <a href="#shop">{t.footerGiftSets}</a>
+          <a href="#packages">{t.footerPackages}</a>
+          <a href="#contact">{t.footerCustom}</a>
+        </div>
+      </nav>
+      <nav aria-label={t.footerCompanyHead}>
+        <p class="footer-head">{t.footerCompanyHead}</p>
+        <div class="footer-links">
+          <a href="#story">{t.navStory}</a>
+          <a href="#faq">{t.navFaq}</a>
+          <a href="#contact">{t.footerContact}</a>
+          <a href="#nutrition">{t.nutritionEyebrow}</a>
+        </div>
+      </nav>
+      <div>
+        <p class="footer-head">{t.footerFollowHead}</p>
+        <div class="footer-links is-follow">
+          <a href={links.igUrl} target="_blank" rel="noopener">Instagram {links.igHandle}</a>
+          <a href={links.lineAddUrl} target="_blank" rel="noopener">LINE {settings.lineId}</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-copy">{t.footerCopyright}</div>
+  </div>
+</footer>

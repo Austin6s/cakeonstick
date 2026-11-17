@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <script src="./ds-base.js"></script>
+  <title>Cake on Stick — Admin Console</title>
+  <meta name="robots" content="noindex, nofollow">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    body { margin: 0; }
+    a { color: var(--brand-primary); text-decoration: none; }
+    a:hover { color: var(--brand-primary-hover); }
+    html:root {
+      --font-display: "Poppins", "Noto Sans TC", "Century Gothic", Futura, sans-serif !important;
+      --font-body: "Inter", "Noto Sans TC", Poppins, sans-serif !important;
+    }
+  </style>
+</helmet>
+
+<div style="font-family: var(--font-body); color: var(--text-primary); min-height: 100vh; background: var(--bg-surface-tint);">
+
+  <sc-if value="{{loggedOut}}" hint-placeholder-val="{{true}}">
+    <div data-screen-label="Login" style="min-height: 100vh; background: var(--charcoal-700); display: flex; align-items: center; justify-content: center; padding: 24px;">
+      <div style="width: 100%; max-width: 400px;">
+        <img src="assets/logo/logo-white.png" alt="Cake on Stick" style="width: 180px; display: block; margin: 0 auto 30px;">
+        <div style="background: var(--white); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); padding: 32px 30px;">
+          <div style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 21px;">Admin Console</div>
+          <p style="margin: 6px 0 22px; font-size: 14px; color: var(--text-secondary);">Content manager · 網站內容管理</p>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <x-import component-from-global-scope="{{namespace}}.Input" label="Email" type="email" placeholder="you@email.com" value="{{loginEmail}}" on-change="{{onLoginEmail}}" hint-size="100%,70px"></x-import>
+            <x-import component-from-global-scope="{{namespace}}.Input" label="Password" type="password" placeholder="••••••••" value="{{loginPw}}" on-change="{{onLoginPw}}" hint-size="100%,70px"></x-import>
+            <sc-if value="{{loginError}}" hint-placeholder-val="{{false}}">
+              <div style="font-size: 13px; color: var(--brand-primary); font-weight: 600;">Please enter your email and password.</div>
+            </sc-if>
+            <x-import component-from-global-scope="{{namespace}}.Button" variant="primary" size="lg" on-click="{{doLogin}}" hint-size="100%,52px">Sign In</x-import>
+          </div>
+          <p style="margin: 18px 0 0; font-size: 12px; color: var(--text-secondary); line-height: 1.6;">Prototype login — any email and password signs you in. Real credentials come with the production build.</p>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{authed}}" hint-placeholder-val="{{false}}">
+    <header style="position: sticky; top: 0; z-index: 50; background: var(--white); border-bottom: 1px solid var(--border-subtle);">
+      <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px 20px; padding: 12px clamp(16px, 3vw, 28px);">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <img src="assets/logo/logo-black-icon.png" alt="" style="height: 32px; width: auto; display: block;">
+          <div style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 15px; letter-spacing: var(--tracking-wordmark); text-transform: uppercase; white-space: nowrap;">Cake on Stick</div>
+          <span style="background: var(--brand-primary); color: var(--white); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; padding: 3px 10px; border-radius: var(--radius-pill);">ADMIN</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+          <sc-if value="{{dirty}}" hint-placeholder-val="{{false}}">
+            <span style="font-size: 13px; font-weight: 600; color: var(--brand-primary); white-space: nowrap;">● Unpublished changes</span>
+            <button onClick="{{discard}}" style="background: none; border: none; font-family: var(--font-body); font-size: 13px; font-weight: 600; color: var(--text-secondary); cursor: pointer; padding: 0;" style-hover="color: var(--text-primary);">Discard</button>
+          </sc-if>
+          <a href="{{siteUrl}}" target="_blank" rel="noopener" style="font-size: 14px; font-weight: 600; white-space: nowrap;">View site ↗</a>
+          <x-import component-from-global-scope="{{namespace}}.Button" variant="primary" size="sm" on-click="{{publish}}" hint-size="100px,38px">Publish</x-import>
+          <button onClick="{{logout}}" style="background: none; border: none; font-family: var(--font-body); font-size: 14px; color: var(--text-secondary); cursor: pointer; padding: 0;" style-hover="color: var(--text-primary);">Sign out</button>
+        </div>
+      </div>
+    </header>
+
+    <div style="display: grid; grid-template-columns: {{shellCols}}; align-items: start;">
+      <nav style="display: flex; flex-direction: {{navDir}}; flex-wrap: wrap; gap: 4px; padding: 20px 14px; background: var(--white); border-right: 1px solid var(--border-subtle); position: sticky; top: 57px; z-index: 10;">
+        <sc-for list="{{navItems}}" as="n" hint-placeholder-count="5">
+          <div onClick="{{n.onClick}}" style="padding: 10px 14px; border-radius: var(--radius-sm); font-size: 14px; font-weight: 600; cursor: pointer; white-space: nowrap; background: {{n.bg}}; color: {{n.color}};" style-hover="color: var(--brand-primary);">{{n.label}}</div>
+        </sc-for>
+      </nav>
+
+      <main data-screen-label="Console" style="padding: 32px clamp(20px, 4vw, 48px) 90px; max-width: 880px; width: 100%; box-sizing: border-box;">
+
+        <sc-if value="{{showContent}}" hint-placeholder-val="{{true}}">
+          <div style="margin-bottom: 26px;">
+            <h2 style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 24px; margin: 0;">Homepage content</h2>
+            <p style="margin: 8px 0 0; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">Write in whichever language you like, then use the translate link under the other field to fill it in — you can always edit the result by hand. Nothing goes live until you press Publish.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <sc-for list="{{contentCards}}" as="c" hint-placeholder-count="2">
+              <div style="background: var(--white); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px 22px 26px;">
+                <div style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 16px; margin-bottom: 16px;">{{c.title}}</div>
+                <div style="display: flex; flex-direction: column; gap: 18px;">
+                  <sc-for list="{{c.pairs}}" as="pair" hint-placeholder-count="2">
+                    <dc-import name="BilingualPair" pair="{{pair}}" hint-size="100%,140px"></dc-import>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{showShop}}" hint-placeholder-val="{{false}}">
+          <div style="margin-bottom: 26px;">
+            <h2 style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 24px; margin: 0;">Shop sets</h2>
+            <p style="margin: 8px 0 0; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">Names, prices, and badges for each set. Leave a badge empty to hide it. Translate links fill the other language for you.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <sc-for list="{{prodRows}}" as="p" hint-placeholder-count="6">
+              <div style="background: var(--white); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px 22px 26px;">
+                <div style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 16px; margin-bottom: 16px;">{{p.title}}</div>
+                <div style="display: flex; flex-direction: column; gap: 18px;">
+                  <sc-for list="{{p.pairs}}" as="pair" hint-placeholder-count="3">
+                    <dc-import name="BilingualPair" pair="{{pair}}" hint-size="100%,110px"></dc-import>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div style="background: var(--coral-50); border: 1px solid var(--border-subtle); border-radius: var(--radius-sm); padding: 14px 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">Product photos are managed on the site itself — open the site and drag a photo onto any empty product card.</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{showPackages}}" hint-placeholder-val="{{false}}">
+          <div style="margin-bottom: 26px;">
+            <h2 style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 24px; margin: 0;">Party packages</h2>
+            <p style="margin: 8px 0 0; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">Theme names for the five packages. Sizes and pricing (15 / 21 / 30 pieces) are fixed in this version.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <sc-for list="{{pkgRows}}" as="k" hint-placeholder-count="5">
+              <div style="background: var(--white); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px 22px 24px;">
+                <div style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 15px; margin-bottom: 14px;">{{k.title}}</div>
+                <sc-for list="{{k.pairs}}" as="pair" hint-placeholder-count="1">
+                  <dc-import name="BilingualPair" pair="{{pair}}" hint-size="100%,110px"></dc-import>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{showFaq}}" hint-placeholder-val="{{false}}">
+          <div style="margin-bottom: 26px;">
+            <h2 style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 24px; margin: 0;">FAQ</h2>
+            <p style="margin: 8px 0 0; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">Questions and answers shown in the FAQ section. Write one language and translate to the other.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <sc-for list="{{faqRows}}" as="f" hint-placeholder-count="4">
+              <div style="background: var(--white); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px 22px 26px;">
+                <div style="font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--brand-primary); margin-bottom: 14px;">{{f.num}}</div>
+                <div style="display: flex; flex-direction: column; gap: 18px;">
+                  <sc-for list="{{f.pairs}}" as="pair" hint-placeholder-count="2">
+                    <dc-import name="BilingualPair" pair="{{pair}}" hint-size="100%,140px"></dc-import>
+                  </sc-for>
+                </div>
+              </div>
+            </sc-for>
+            <div>
+              <button onClick="{{addFaq}}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 22px; border-radius: var(--radius-pill); font-family: var(--font-body); font-weight: 600; font-size: 14px; cursor: pointer; border: 1.5px solid var(--brand-primary); color: var(--brand-primary); background: var(--white);" style-hover="background: var(--brand-primary); color: var(--white);">＋ Add a question</button>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{showSettings}}" hint-placeholder-val="{{false}}">
+          <div style="margin-bottom: 26px;">
+            <h2 style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 24px; margin: 0;">Settings</h2>
+            <p style="margin: 8px 0 0; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">Contact channels and site-wide display options.</p>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div style="background: var(--white); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px 22px 26px;">
+              <div style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 16px; margin-bottom: 16px;">Contact channels</div>
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px 16px;">
+                <x-import component-from-global-scope="{{namespace}}.Input" label="Instagram handle" placeholder="cakeonstick" value="{{igVal}}" on-change="{{onIg}}" hint-size="100%,70px"></x-import>
+                <x-import component-from-global-scope="{{namespace}}.Input" label="LINE ID" placeholder="@544zacuj" value="{{lineVal}}" on-change="{{onLine}}" hint-size="100%,70px"></x-import>
+                <x-import component-from-global-scope="{{namespace}}.Input" label="Contact email" type="email" value="{{emailVal}}" on-change="{{onEmail}}" hint-size="100%,70px"></x-import>
+              </div>
+            </div>
+            <div style="background: var(--white); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px 22px 26px;">
+              <div style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 16px; margin-bottom: 16px;">Display</div>
+              <div onClick="{{togglePrices}}" style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                <div style="width: 44px; height: 26px; border-radius: var(--radius-pill); background: {{pricesBg}}; position: relative; flex-shrink: 0; transition: background var(--duration-fast) var(--ease-standard);">
+                  <div style="position: absolute; top: 3px; left: {{pricesKnob}}; width: 20px; height: 20px; border-radius: 50%; background: var(--white); box-shadow: var(--shadow-sm); transition: left var(--duration-fast) var(--ease-standard);"></div>
+                </div>
+                <span style="font-size: 14px; font-weight: 600;">Show prices on the site</span>
+              </div>
+              <p style="margin: 12px 0 0; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">When off, product cards show 私訊詢價 / “DM for pricing” instead of prices.</p>
+            </div>
+            <div style="background: var(--white); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 22px 22px 26px;">
+              <div style="font-family: var(--font-display); font-weight: var(--weight-semibold); font-size: 16px; margin-bottom: 10px;">Reset</div>
+              <p style="margin: 0 0 16px; font-size: 13px; color: var(--text-secondary); line-height: 1.6;">Restore every published change back to the original site copy. This cannot be undone.</p>
+              <button onClick="{{resetAll}}" style="display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 22px; border-radius: var(--radius-pill); font-family: var(--font-body); font-weight: 600; font-size: 14px; cursor: pointer; border: 1.5px solid var(--brand-primary); color: var(--brand-primary); background: var(--white);" style-hover="background: var(--brand-primary); color: var(--white);">Reset all content</button>
+            </div>
+          </div>
+        </sc-if>
+
+      </main>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{toastVisible}}" hint-placeholder-val="{{false}}">
+    <div style="position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); z-index: 200; background: var(--charcoal-700); color: var(--white); font-size: 14px; font-weight: 600; padding: 12px 24px; border-radius: var(--radius-pill); box-shadow: var(--shadow-lg); white-space: nowrap;">{{toastMsg}}</div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;demoPassword&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Security&quot;},&quot;siteUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;CakeOnStickSite.dc.html&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Links&quot;}}">
+const LS_PUB = "cos-published-content";
+const LS_DRAFT = "cos-admin-draft";
+const SS_AUTH = "cos-admin-authed";
+
+const DEFAULTS = {
+  strings: {
+    zh: {
+      heroTitle: "Sweet & Sticky",
+      heroBody: "手工製作蛋糕棒——送禮、慶祝、日常的小確幸。",
+      scheduleLead: "接單時間：每週四～週六。",
+      scheduleBody: "訂單於次週三製作並出貨。急單請另外私訊聯繫。",
+    },
+    en: {
+      heroTitle: "Sweet & Sticky",
+      heroBody: "Handmade cakesicles for gifting, celebrating, and everyday treats.",
+      scheduleLead: "Orders open Thursday–Saturday.",
+      scheduleBody: "Made fresh and shipped the following Wednesday. For rush orders, message us directly.",
+    },
+  },
+  products: {
+    zh: [
+      { name: "經典組", price: "NT$400／組", badge: "" },
+      { name: "單一口味組", price: "NT$400／組", badge: "" },
+      { name: "生日禮盒", price: "NT$450／組", badge: "" },
+      { name: "愛的禮盒", price: "NT$450／組", badge: "" },
+      { name: "女寶寶彌月禮盒", price: "NT$450／組", badge: "" },
+      { name: "男寶寶彌月禮盒", price: "NT$450／組", badge: "" },
+      { name: "You've Got a Friend", price: "NT$450／組", badge: "" },
+    ],
+    en: [
+      { name: "Classic Set", price: "NT$400 / set", badge: "" },
+      { name: "Single Flavor Set", price: "NT$400 / set", badge: "" },
+      { name: "Birthday Set", price: "NT$450 / set", badge: "" },
+      { name: "Love Set", price: "NT$450 / set", badge: "" },
+      { name: "Baby Girl Newborn Set", price: "NT$450 / set", badge: "" },
+      { name: "Baby Boy Newborn Set", price: "NT$450 / set", badge: "" },
+      { name: "You've Got a Friend Set", price: "NT$450 / set", badge: "" },
+    ],
+  },
+  packages: {
+    zh: [{ name: "You've Got a Friend" },{ name: "生日" }, { name: "寶寶" }, { name: "婚禮" }, { name: "性別揭曉" }],
+    en: [{ name: "You've Got a Friend" }, { name: "Birthday" }, { name: "Baby Shower" }, { name: "Wedding" }, { name: "Gender Reveal" }],
+  },
+  faqs: {
+    zh: [
+      { q: "怎麼訂購、怎麼付款？", a: "這裡沒有線上結帳，直接 IG 私訊、加 LINE，或填寫下方表單即可。細節一起確認後，再以轉帳付款。確認前完全不需付費。" },
+      { q: "需要提前多久下單？", a: "我們每週四至週六接單，於次週三製作並出貨。客製訂單與派對套組，建議在活動前 1 至 2 週聯繫，節日前後請盡早。若是婚禮或大型活動，歡迎提早預約，支付 30% 訂金即可確認檔期。" },
+      { q: "運費怎麼算？可以自取嗎？", a: "全台宅配運費 NT$190（冷藏配送），滿 NT$3,000 免運。自取方式尚在規劃中，確定後會另行公告。" },
+      { q: "可以指定完全客製的主題或設計嗎？", a: "歡迎客製，實際可行度會依蛋糕棒的呈現方式而定。跟我們聊聊你的想法，我們一起看看能做到什麼程度。" },
+    ],
+    en: [
+      { q: "How do I order and pay?", a: "No online checkout here. Just DM us on Instagram, message us on LINE, or send the form below. We'll confirm the details together, and payment is a simple money transfer once your order is locked in. Nothing to pay up front." },
+      { q: "How far in advance should I order?", a: "We take orders every Thursday through Saturday, then make and ship everything the following Wednesday. For custom orders and party packages, reach out 1 to 2 weeks ahead of your event, especially around holidays. For weddings or larger events, feel free to reach out well in advance to book your date. A 30% deposit secures it." },
+      { q: "What about shipping and pickup?", a: "We ship cold anywhere in Taiwan for NT$190, free over NT$3,000. Pickup options are still being finalized, so stay tuned." },
+      { q: "Can I request a fully custom theme or design?", a: "Custom themes are always welcome. What's possible depends on how well it translates onto a small cakesicle, so just tell us your idea and we'll see what we can do together." },
+    ],
+  },
+  settings: { instagramHandle: "cakeonstick", lineId: "@544zacuj", contactEmail: "cakeonstick2026@gmail.com", showPrices: true },
+};
+
+function clone(o) { return JSON.parse(JSON.stringify(o)); }
+function loadJSON(k) { try { return JSON.parse(localStorage.getItem(k)) || null; } catch (e) { return null; } }
+function mergeInto(d, o) {
+  if (!o) return d;
+  ["zh", "en"].forEach((L) => {
+    if (o.strings && o.strings[L]) Object.keys(d.strings[L]).forEach((k) => { if (o.strings[L][k] !== undefined) d.strings[L][k] = o.strings[L][k]; });
+    ["products", "packages"].forEach((sec) => {
+      if (o[sec] && o[sec][L]) d[sec][L].forEach((item, i) => Object.assign(item, o[sec][L][i] || {}));
+    });
+    if (o.faqs && o.faqs[L]) {
+      d.faqs[L].forEach((f, i) => Object.assign(f, o.faqs[L][i] || {}));
+      o.faqs[L].slice(d.faqs[L].length).forEach((f) => { if (f) d.faqs[L].push({ q: f.q || "", a: f.a || "" }); });
+    }
+  });
+  if (o.settings) Object.assign(d.settings, o.settings);
+  return d;
+}
+function pubBase() { return mergeInto(clone(DEFAULTS), loadJSON(LS_PUB)); }
+function seedDraft() {
+  const saved = loadJSON(LS_DRAFT);
+  if (saved && saved.strings && saved.settings) return mergeInto(clone(DEFAULTS), saved);
+  return pubBase();
+}
+
+function strSpec(key, o) { return Object.assign({ id: "str." + key, get: (d, L) => d.strings[L][key], set: (d, L, v) => { d.strings[L][key] = v; } }, o); }
+function prodSpec(i, f, o) { return Object.assign({ id: "prod." + i + "." + f, get: (d, L) => d.products[L][i][f], set: (d, L, v) => { d.products[L][i][f] = v; } }, o); }
+function pkgSpec(i, o) { return Object.assign({ id: "pkg." + i, get: (d, L) => d.packages[L][i].name, set: (d, L, v) => { d.packages[L][i].name = v; } }, o); }
+function faqSpec(i, f, o) { return Object.assign({ id: "faq." + i + "." + f, get: (d, L) => (d.faqs[L][i] || {})[f] || "", set: (d, L, v) => { if (!d.faqs[L][i]) d.faqs[L][i] = { q: "", a: "" }; d.faqs[L][i][f] = v; } }, o); }
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const d = seedDraft();
+    this.state = {
+      authed: typeof sessionStorage !== "undefined" && sessionStorage.getItem(SS_AUTH) === "1",
+      d: d,
+      dirty: JSON.stringify(d) !== JSON.stringify(pubBase()),
+      section: "content",
+      loginEmail: "", loginPw: "", loginError: false,
+      toast: "",
+      busy: {},
+      windowWidth: typeof window !== "undefined" ? window.innerWidth : 1280,
+    };
+  }
+
+  componentDidMount() {
+    this._onResize = () => this.setState({ windowWidth: window.innerWidth });
+    window.addEventListener("resize", this._onResize);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener("resize", this._onResize);
+    clearTimeout(this._tt);
+  }
+
+  edit(fn) {
+    this.setState((s) => {
+      const d = clone(s.d);
+      fn(d);
+      localStorage.setItem(LS_DRAFT, JSON.stringify(d));
+      return { d: d, dirty: JSON.stringify(d) !== JSON.stringify(pubBase()) };
+    });
+  }
+
+  setSetting = (k) => (e) => this.edit((d) => { d.settings[k] = e.target.value; });
+  addFaq = () => this.edit((d) => { d.faqs.zh.push({ q: "", a: "" }); d.faqs.en.push({ q: "", a: "" }); });
+  togglePrices = () => this.edit((d) => { d.settings.showPrices = !d.settings.showPrices; });
+
+  mkPair(spec) {
+    const d = this.state.d;
+    const bZh = !!this.state.busy[spec.id + ":zh"];
+    const bEn = !!this.state.busy[spec.id + ":en"];
+    return {
+      labelZh: spec.labelZh, labelEn: spec.labelEn,
+      isArea: !!spec.area, isLine: !spec.area, rows: spec.rows || 3,
+      phZh: spec.phZh || "", phEn: spec.phEn || "",
+      valZh: spec.get(d, "zh"), valEn: spec.get(d, "en"),
+      onZh: (e) => this.edit((dd) => spec.set(dd, "zh", e.target.value)),
+      onEn: (e) => this.edit((dd) => spec.set(dd, "en", e.target.value)),
+      toZh: () => this.runTranslate(spec, "zh"),
+      toEn: () => this.runTranslate(spec, "en"),
+      toZhLabel: bZh ? "翻譯中…" : "← 由 English 翻譯",
+      toEnLabel: bEn ? "Translating…" : "← Translate from 中文",
+      zhBtnColor: bZh ? "var(--brand-primary)" : "var(--text-secondary)",
+      enBtnColor: bEn ? "var(--brand-primary)" : "var(--text-secondary)",
+    };
+  }
+
+  async runTranslate(spec, target) {
+    const key = spec.id + ":" + target;
+    if (this.state.busy[key]) return;
+    const src = target === "zh" ? "en" : "zh";
+    const text = (spec.get(this.state.d, src) || "").trim();
+    if (!text) {
+      this.showToast(target === "zh" ? "The English field is empty — write it first" : "中文欄位是空的 — write the Chinese first");
+      return;
+    }
+    this.setState((s) => ({ busy: { ...s.busy, [key]: true } }));
+    try {
+      const out = await this.claudeTranslate(text, src, target);
+      if (out) this.edit((d) => spec.set(d, target, out));
+    } catch (e) {
+      this.showToast("Translation unavailable — try again, or edit by hand");
+    }
+    this.setState((s) => { const b = { ...s.busy }; delete b[key]; return { busy: b }; });
+  }
+
+  async claudeTranslate(text, src, target) {
+    if (!window.claude || !window.claude.complete) throw new Error("no-claude");
+    const srcName = src === "zh" ? "Traditional Chinese (Taiwan)" : "English";
+    const tgtName = target === "zh" ? "Traditional Chinese as written in Taiwan (zh-TW)" : "natural, warm English";
+    const prompt = "You translate website copy for Cake on Stick, a premium handmade cakesicle brand in Taiwan. Tone: warm, celebratory, concise, slightly playful — boutique bakery, not corporate.\n\nTranslate the following " + srcName + " text into " + tgtName + ". Keep brand names, NT$ prices, and numbers unchanged. Preserve line breaks. Reply with ONLY the translation — no quotes, no explanations.\n\n" + text;
+    const res = await window.claude.complete(prompt);
+    return (res || "").trim();
+  }
+
+  buildOverrides(d) {
+    const o = { strings: { zh: {}, en: {} }, products: { zh: [], en: [] }, packages: { zh: [], en: [] }, faqs: { zh: [], en: [] }, settings: {} };
+    ["zh", "en"].forEach((L) => {
+      Object.keys(DEFAULTS.strings[L]).forEach((k) => {
+        const v = d.strings[L][k];
+        if (v && v.trim() !== "" && v !== DEFAULTS.strings[L][k]) o.strings[L][k] = v;
+      });
+      o.products[L] = d.products[L].map((p, i) => {
+        const def = DEFAULTS.products[L][i]; const e = {};
+        ["name", "price", "badge"].forEach((f) => { if ((p[f] || "") !== (def[f] || "")) e[f] = p[f] || ""; });
+        return e;
+      });
+      o.packages[L] = d.packages[L].map((p, i) => {
+        const e = {};
+        if (p.name && p.name !== DEFAULTS.packages[L][i].name) e.name = p.name;
+        return e;
+      });
+      o.faqs[L] = d.faqs[L].map((f, i) => {
+        const def = DEFAULTS.faqs[L][i];
+        if (!def) return { q: f.q || "", a: f.a || "" };
+        const e = {};
+        if (f.q && f.q !== def.q) e.q = f.q;
+        if (f.a && f.a !== def.a) e.a = f.a;
+        return e;
+      });
+    });
+    Object.keys(DEFAULTS.settings).forEach((k) => {
+      const v = d.settings[k];
+      if (v !== DEFAULTS.settings[k] && v !== "") o.settings[k] = v;
+    });
+    return o;
+  }
+
+  showToast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => this.setState({ toast: "" }), 2600);
+  }
+
+  publish = () => {
+    localStorage.setItem(LS_PUB, JSON.stringify(this.buildOverrides(this.state.d)));
+    localStorage.setItem(LS_DRAFT, JSON.stringify(this.state.d));
+    this.setState({ dirty: false });
+    this.showToast("Published — the live site is updated");
+  };
+
+  discard = () => {
+    const base = pubBase();
+    localStorage.setItem(LS_DRAFT, JSON.stringify(base));
+    this.setState({ d: base, dirty: false });
+    this.showToast("Draft discarded");
+  };
+
+  resetAll = () => {
+    if (!window.confirm("Reset ALL published content back to the original site copy?")) return;
+    const base = clone(DEFAULTS);
+    localStorage.setItem(LS_PUB, "{}");
+    localStorage.setItem(LS_DRAFT, JSON.stringify(base));
+    this.setState({ d: base, dirty: false });
+    this.showToast("All content reset to the original copy");
+  };
+
+  doLogin = () => {
+    const need = (this.props.demoPassword ?? "").trim();
+    if (!this.state.loginEmail.trim() || !this.state.loginPw || (need && this.state.loginPw !== need)) {
+      this.setState({ loginError: true });
+      return;
+    }
+    sessionStorage.setItem(SS_AUTH, "1");
+    this.setState({ authed: true, loginError: false, loginPw: "" });
+  };
+
+  logout = () => {
+    sessionStorage.removeItem(SS_AUTH);
+    this.setState({ authed: false });
+  };
+
+  renderVals() {
+    const s = this.state;
+    const d = s.d;
+    const isMobile = s.windowWidth < 860;
+    const sec = s.section;
+    const NAV = [
+      ["content", "Homepage · 首頁"],
+      ["shop", "Shop · 商品"],
+      ["packages", "Packages · 套組"],
+      ["faq", "FAQ · 問答"],
+      ["settings", "Settings · 設定"],
+    ];
+    return {
+      namespace: "CakeOnStickDesignSystem_a9f058",
+      loggedOut: !s.authed,
+      authed: s.authed,
+      loginEmail: s.loginEmail,
+      loginPw: s.loginPw,
+      onLoginEmail: (e) => this.setState({ loginEmail: e.target.value }),
+      onLoginPw: (e) => this.setState({ loginPw: e.target.value }),
+      loginError: s.loginError,
+      doLogin: this.doLogin,
+      logout: this.logout,
+      siteUrl: this.props.siteUrl ?? "CakeOnStickSite.dc.html",
+      shellCols: isMobile ? "1fr" : "230px 1fr",
+      navDir: isMobile ? "row" : "column",
+      navItems: NAV.map(([id, label]) => ({
+        label: label,
+        onClick: () => this.setState({ section: id }),
+        bg: sec === id ? "var(--coral-50)" : "transparent",
+        color: sec === id ? "var(--brand-primary)" : "var(--text-secondary)",
+      })),
+      showContent: sec === "content",
+      showShop: sec === "shop",
+      showPackages: sec === "packages",
+      showFaq: sec === "faq",
+      showSettings: sec === "settings",
+      dirty: s.dirty,
+      publish: this.publish,
+      discard: this.discard,
+      resetAll: this.resetAll,
+      addFaq: this.addFaq,
+      contentCards: [
+        { title: "Hero — the first thing visitors see", pairs: [
+          this.mkPair(strSpec("heroTitle", { labelZh: "主標題（中文）", labelEn: "Headline (English)", area: true, rows: 3 })),
+          this.mkPair(strSpec("heroBody", { labelZh: "副標文字（中文）", labelEn: "Subtitle (English)", area: true, rows: 3 })),
+        ] },
+        { title: "Ordering schedule banner", pairs: [
+          this.mkPair(strSpec("scheduleLead", { labelZh: "接單時間（中文）", labelEn: "Schedule lead (English)" })),
+          this.mkPair(strSpec("scheduleBody", { labelZh: "說明文字（中文）", labelEn: "Details (English)", area: true, rows: 2 })),
+        ] },
+      ],
+      prodRows: DEFAULTS.products.en.map((def, i) => ({
+        title: DEFAULTS.products.zh[i].name + " · " + def.name,
+        pairs: [
+          this.mkPair(prodSpec(i, "name", { labelZh: "名稱（中文）", labelEn: "Name (English)" })),
+          this.mkPair(prodSpec(i, "price", { labelZh: "價格顯示（中文）", labelEn: "Price (English)" })),
+          this.mkPair(prodSpec(i, "badge", { labelZh: "標籤（中文）", labelEn: "Badge (English)", phZh: "例如：期間限定", phEn: "e.g. Limited Edition" })),
+        ],
+      })),
+      pkgRows: DEFAULTS.packages.en.map((def, i) => ({
+        title: DEFAULTS.packages.zh[i].name + " · " + def.name,
+        pairs: [this.mkPair(pkgSpec(i, { labelZh: "主題名稱（中文）", labelEn: "Theme name (English)" }))],
+      })),
+      faqRows: d.faqs.zh.map((f, i) => ({
+        num: "Question " + (i + 1),
+        pairs: [
+          this.mkPair(faqSpec(i, "q", { labelZh: "問題（中文）", labelEn: "Question (English)" })),
+          this.mkPair(faqSpec(i, "a", { labelZh: "回答（中文）", labelEn: "Answer (English)", area: true, rows: 3 })),
+        ],
+      })),
+      igVal: d.settings.instagramHandle, onIg: this.setSetting("instagramHandle"),
+      lineVal: d.settings.lineId, onLine: this.setSetting("lineId"),
+      emailVal: d.settings.contactEmail, onEmail: this.setSetting("contactEmail"),
+      togglePrices: this.togglePrices,
+      pricesBg: d.settings.showPrices ? "var(--brand-primary)" : "var(--border-default)",
+      pricesKnob: d.settings.showPrices ? "21px" : "3px",
+      toastVisible: !!s.toast,
+      toastMsg: s.toast,
+    };
+  }
+}
+</script>
+</body>
+</html>

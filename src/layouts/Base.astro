@@ -1,0 +1,84 @@
+---
+/**
+ * The page shell: fonts, tokens, and the per-language SEO and sharing tags.
+ * Fonts are self-hosted (npm packages built into the site), so no visitor
+ * request goes to a font service.
+ */
+import '@fontsource-variable/inter/wght.css';
+import '@fontsource/poppins/latin-600.css';
+import '@fontsource/poppins/latin-700.css';
+import '../styles/tokens.css';
+import '../styles/site.css';
+import hero from '../assets/photos/drizzle-trio-coral-bg.png';
+import { content, settings } from '../content';
+import type { Lang } from '../content/types';
+import { HERO, responsiveSources } from '../lib/images';
+import { absoluteUrl, assetPath, buildInfo, homePath, isProduction, links } from '../lib/site';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const { htmlLang, strings: t } = content[lang];
+const canonical = absoluteUrl(homePath(lang));
+const ogImage = absoluteUrl(assetPath('og.jpg'));
+const heroSources = await responsiveSources(hero, HERO.widths, HERO.quality);
+
+const structuredData = {
+  '@context': 'https://schema.org',
+  '@type': 'Bakery',
+  name: 'Cake on Stick',
+  description: t.metaDescription,
+  url: canonical,
+  image: ogImage,
+  logo: absoluteUrl(assetPath('apple-touch-icon.png')),
+  email: settings.contactEmail,
+  address: { '@type': 'PostalAddress', addressCountry: 'TW' },
+  areaServed: { '@type': 'Country', name: 'Taiwan' },
+  sameAs: [links.igUrl],
+};
+---
+
+<!doctype html>
+<html lang={htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <slot name="head-first" />
+    <title>{t.metaTitle}</title>
+    <meta name="description" content={t.metaDescription} />
+    {!isProduction && <meta name="robots" content="noindex, nofollow" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang="zh-Hant-TW" href={absoluteUrl(homePath('zh'))} />
+    <link rel="alternate" hreflang="en" href={absoluteUrl(homePath('en'))} />
+    <link rel="alternate" hreflang="x-default" href={absoluteUrl(homePath('zh'))} />
+    <link rel="icon" type="image/png" sizes="48x48" href={assetPath('favicon.png')} />
+    <link rel="apple-touch-icon" href={assetPath('apple-touch-icon.png')} />
+    <link rel="sitemap" href={assetPath('sitemap.xml')} />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="build" content={buildInfo} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Cake on Stick" />
+    <meta property="og:title" content={t.metaTitle} />
+    <meta property="og:description" content={t.metaDescription} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={lang === 'zh' ? 'zh_TW' : 'en_US'} />
+    <meta property="og:locale:alternate" content={lang === 'zh' ? 'en_US' : 'zh_TW'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      imagesrcset={heroSources.avif.srcSet.attribute}
+      imagesizes={HERO.sizes}
+      fetchpriority="high"
+    />
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(structuredData).replace(/</g, '\\u003c')} />
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

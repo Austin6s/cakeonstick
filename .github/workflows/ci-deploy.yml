@@ -1,0 +1,136 @@
+name: CI and deploy
+
+# dev  -> the dev environment   https://austin6s.github.io/cakeonstick/dev/
+# main -> production            https://austin6s.github.io/cakeonstick/
+#
+# Every push and pull request is built and tested. A push to dev or main is then
+# published to its own part of the gh-pages branch (see scripts/publish.sh) and the
+# live page is checked to be the new version.
+#
+# The address comes from two repository variables, SITE_URL and BASE_PATH. Unset, the
+# site is served from github.io as above. For the site's own domain (README, "Moving to
+# cakeonstick.com") they are https://cakeonstick.com and /, and dev becomes /dev/.
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  ASTRO_TELEMETRY_DISABLED: 1
+
+jobs:
+  check:
+    name: Build and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: check-${{ github.ref }}
+      cancel-in-progress: true
+    outputs:
+      target: ${{ steps.env.outputs.target }}
+      url: ${{ steps.env.outputs.url }}
+      domain: ${{ steps.env.outputs.domain }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - name: Choose the environment
+        id: env
+        env:
+          SITE: ${{ vars.SITE_URL || 'https://austin6s.github.io' }}
+          BASE: ${{ vars.BASE_PATH || '/cakeonstick/' }}
+        run: |
+          if [ "$GITHUB_REF" = "refs/heads/main" ]; then target=production; base="$BASE"; else target=dev; base="${BASE}dev/"; fi
+          {
+            echo "DEPLOY_ENV=$target"
+            echo "BASE_PATH=$base"
+            echo "SITE_URL=$SITE"
+            echo "BUILD_SHA=$GITHUB_SHA"
+          } >> "$GITHUB_ENV"
+          host="${SITE#*://}"; host="${host%%/*}"
+          case "$host" in *.github.io) domain="" ;; *) domain="$host" ;; esac
+          {
+            echo "target=$target"
+            echo "url=${SITE%/}$base"
+            echo "domain=$domain"
+          } >> "$GITHUB_OUTPUT"
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Check the built site (pages, SEO tags, no third-party hosts)
+        run: npm run check:site
+
+      - name: Install the test browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Browser tests
+        run: npm run test:e2e
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: site
+          path: dist
+          retention-days: 7
+          include-hidden-files: true
+
+  deploy:
+    name: Deploy
+    needs: check
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev')
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    # One publish at a time, in order: dev and production share the gh-pages branch.
+    concurrency:
+      group: publish-pages
+      cancel-in-progress: false
+    environment:
+      name: ${{ needs.check.outputs.target }}
+      url: ${{ needs.check.outputs.url }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: site
+          path: dist
+
+      - name: Publish to GitHub Pages
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          CUSTOM_DOMAIN: ${{ needs.check.outputs.domain }}
+        run: scripts/publish.sh "${{ needs.check.outputs.target }}"
+
+      - name: Wait until the live site serves this version
+        env:
+          URL: ${{ needs.check.outputs.url }}
+        run: |
+          for attempt in $(seq 1 40); do
+            if curl -fsS "$URL?v=$GITHUB_SHA" | grep -q "$GITHUB_SHA"; then
+              echo "Live: $URL is serving $GITHUB_SHA"
+              exit 0
+            fi
+            sleep 15
+          done
+          echo "::error::$URL was not serving $GITHUB_SHA after 10 minutes"
+          exit 1

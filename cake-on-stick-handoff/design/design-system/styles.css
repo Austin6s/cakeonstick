@@ -1,0 +1,6 @@
+/* Cake on Stick — Design System global stylesheet
+   Consumers should link only this file. Everything it imports is shipped. */
+@import "./tokens/fonts.css";
+@import "./tokens/colors.css";
+@import "./tokens/typography.css";
+@import "./tokens/spacing.css";

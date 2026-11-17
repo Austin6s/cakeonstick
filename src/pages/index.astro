@@ -1,0 +1,26 @@
+---
+// Traditional Chinese (Taiwan): the default language, at the site root.
+import HomePage from '../components/HomePage.astro';
+import { homePath } from '../lib/site';
+
+const enUrl = homePath('en');
+---
+
+<HomePage lang="zh">
+  <!-- Runs before the page paints. A visitor who chose a language keeps it; a first-time
+       visitor whose browser is not set to Chinese is sent to the English page. Nothing is
+       sent to any server. Search-engine crawlers are left on the page they asked for. -->
+  <script is:inline slot="head-first" define:vars={{ enUrl }}>
+    try {
+      if (!/bot|crawl|spider|lighthouse/i.test(navigator.userAgent)) {
+        var chosen = localStorage.getItem('cos-lang');
+        var browserIsChinese = (navigator.languages || [navigator.language || '']).some(function (l) {
+          return l.toLowerCase().indexOf('zh') === 0;
+        });
+        if (chosen === 'en' || (!chosen && !browserIsChinese)) {
+          location.replace(enUrl + location.search + location.hash);
+        }
+      }
+    } catch (e) {}
+  </script>
+</HomePage>

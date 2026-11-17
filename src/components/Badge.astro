@@ -1,0 +1,9 @@
+---
+/** The design system's Badge: a small pill label. */
+interface Props {
+  tone?: 'outline';
+}
+const { tone = 'outline' } = Astro.props;
+---
+
+<span class:list={['badge', `badge-${tone}`]}><slot /></span>

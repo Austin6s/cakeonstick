@@ -1,0 +1,80 @@
+---
+/**
+ * The quick-order dialog for one gift set or party package. A native <dialog>:
+ * the browser moves focus in, keeps it inside, closes on Esc and returns focus
+ * to the button that opened it.
+ */
+import type { ImageMetadata } from 'astro';
+import type { Flavor, Strings } from '../content/types';
+import { links } from '../lib/site';
+import Photo from './Photo.astro';
+
+interface Props {
+  id: string;
+  name: string;
+  priceDisplay: string;
+  photo?: ImageMetadata;
+  flavors?: Flavor[];
+  message: string;
+  t: Strings;
+}
+const { id, name, priceDisplay, photo, flavors = [], message, t } = Astro.props;
+const linePath = links.lineMessagePath(message);
+---
+
+<dialog class="order" id={`order-${id}`} aria-labelledby={`order-${id}-title`} data-message={message}>
+  <div class="order-inner">
+    {
+      photo && (
+        <Photo
+          src={photo}
+          alt=""
+          widths={[440, 880]}
+          sizes="(min-width: 440px) 440px, 100vw"
+          class="order-photo"
+        />
+      )
+    }
+    <div class="order-content">
+      <div class="order-head">
+        <h2 id={`order-${id}-title`}>{name}</h2>
+        <div class="order-price">{priceDisplay}</div>
+      </div>
+      {
+        flavors.length > 0 && (
+          <div>
+            <p class="order-label">{t.orderFlavorsLabel}</p>
+            <ul class="order-flavors">
+              {flavors.map((fl) => (
+                <li>
+                  <span class="flavor-name">{fl.name}</span>
+                  <span class="flavor-desc">{fl.desc}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
+      <p class="order-hint">{t.orderHint}</p>
+      <div>
+        <div class="order-msg-head">
+          <p class="order-label">{t.orderMsgLabel}</p>
+          <button class="order-copy" type="button" data-copy data-label={t.copyBtn} data-label-done={t.copiedBtn}>
+            {t.copyBtn}
+          </button>
+        </div>
+        <p class="order-message">{message}</p>
+      </div>
+      <div class="order-actions">
+        <a class="order-line" href={`https://line.me/R/${linePath}`} target="_blank" rel="noopener" data-line={linePath}>
+          {t.orderLineCta}
+        </a>
+        <a class="order-ig" href={links.igDmUrl} target="_blank" rel="noopener" data-order-ig>
+          {t.orderIgCta}
+        </a>
+      </div>
+      <p class="order-copied" role="status" data-copied data-text={t.orderIgCopied}></p>
+      <button class="order-cancel" type="button" data-close>{t.orderCancel}</button>
+    </div>
+  </div>
+</dialog>

@@ -1,0 +1,145 @@
+/* Cake on Stick — design tokens.
+   Ported from the design system (colors, typography, spacing), with the fixes the
+   handoff asked to fold in: a text-safe coral, a darker secondary text colour,
+   LINE green tokens, and self-hosted fonts in place of Google Fonts. */
+
+:root {
+  /* ---- Base coral (primary/brand) ---- */
+  --coral-50: #fff1f0;
+  --coral-100: #ffdedb;
+  --coral-200: #ffbdb6;
+  --coral-300: #ff958b;
+  --coral-400: #ff7166;
+  --coral-500: #ff5a56; /* brand coral — sampled from logo lockup background */
+  --coral-600: #f23f3c;
+  --coral-700: #cc302e;
+  --coral-800: #a3282a;
+  --coral-900: #7a1f22;
+
+  /* ---- Base charcoal (dark neutral) ---- */
+  --charcoal-50: #f4f4f5;
+  --charcoal-100: #e4e4e6;
+  --charcoal-200: #c7c7cb;
+  --charcoal-300: #a3a3a9;
+  --charcoal-400: #767679;
+  --charcoal-500: #4d4d50;
+  --charcoal-600: #38383b;
+  --charcoal-700: #2e2e30; /* brand charcoal — sampled from logo lockup background */
+  --charcoal-800: #222224;
+  --charcoal-900: #171718;
+
+  --white: #ffffff;
+
+  /* ---- Semantic aliases ---- */
+  --bg-page: var(--white);
+  --bg-surface: var(--white);
+  --bg-surface-tint: var(--coral-50);
+  --bg-dark: var(--charcoal-700);
+  --bg-dark-deep: var(--charcoal-900);
+
+  --text-primary: var(--charcoal-700);
+  /* Darkened from #767679 so it passes 4.5:1 on the coral-tint sections too. */
+  --text-secondary: #6b6b6f;
+  --text-inverse: var(--white);
+  --text-on-coral: var(--white);
+
+  --brand-primary: var(--coral-500);
+  --brand-primary-hover: var(--coral-600);
+  --brand-primary-press: var(--coral-700);
+  /* Coral text under 24px: brand coral is only 3.1:1 on white, coral-700 is 5.2:1. */
+  --coral-text: var(--coral-700);
+
+  /* LINE's brand green, and a shade that passes 4.5:1 as text on white. */
+  --line-green: #06c755;
+  --line-green-hover: #05b34c;
+  --line-green-text: #05803a;
+
+  --border-subtle: var(--charcoal-100);
+  --border-default: var(--charcoal-200);
+  --border-on-dark: var(--charcoal-500);
+
+  --focus-ring: var(--coral-700);
+
+  /* ---- Photography-only accent tints (NOT brand UI colors) ---- */
+  --tint-blush: #f6d9d2;
+  --tint-baby-blue: #cfe0ea;
+  --tint-baby-pink: #f6d8dd;
+
+  /* ---- Typography ---- */
+  /* Latin text uses Poppins (display) and Inter (body), self-hosted. Chinese text uses
+     the Traditional Chinese font already on the visitor's device: Noto Sans on Android,
+     PingFang on Apple devices, JhengHei on Windows. The design named Noto Sans TC as a
+     web font, but this page needs about 1.2 MB of it, which is too slow on a phone. */
+  --font-cjk: 'Noto Sans TC', 'Noto Sans CJK TC', 'PingFang TC', 'Microsoft JhengHei';
+  --font-display: 'Poppins', var(--font-cjk), 'Century Gothic', Futura, sans-serif;
+  --font-body: 'Inter Variable', 'Inter', var(--font-cjk), Poppins, sans-serif;
+
+  --tracking-wordmark: 0.14em;
+  --tracking-display: 0.01em;
+  --tracking-body: 0em;
+  --tracking-eyebrow: 0.18em;
+
+  --size-display-xl: clamp(2.75rem, 2rem + 3vw, 4.5rem);
+  --size-display-lg: clamp(2.25rem, 1.8rem + 2vw, 3.25rem);
+  --size-display-md: clamp(1.75rem, 1.5rem + 1vw, 2.25rem);
+  --size-heading-lg: 1.75rem;
+  --size-heading-md: 1.375rem;
+  --size-heading-sm: 1.125rem;
+  --size-eyebrow: 0.8125rem;
+  --size-body-lg: 1.125rem;
+  --size-body-md: 1rem;
+  --size-body-sm: 0.875rem;
+  --size-caption: 0.75rem;
+  --size-button: 0.9375rem;
+
+  --leading-display: 1.05;
+  --leading-heading: 1.25;
+  --leading-body: 1.6;
+  --leading-tight: 1;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* ---- Spacing scale — 4px base ---- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* ---- Radii ---- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 32px;
+  --radius-pill: 999px;
+
+  /* ---- Shadows — soft, warm, low-contrast ---- */
+  --shadow-sm: 0 1px 2px rgba(46, 46, 48, 0.06), 0 1px 1px rgba(46, 46, 48, 0.04);
+  --shadow-md: 0 8px 24px rgba(46, 46, 48, 0.08), 0 2px 6px rgba(46, 46, 48, 0.05);
+  --shadow-lg: 0 20px 48px rgba(46, 46, 48, 0.12), 0 6px 16px rgba(46, 46, 48, 0.06);
+  --shadow-coral-glow: 0 12px 32px rgba(255, 90, 86, 0.28);
+
+  /* ---- Motion ---- */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 150ms;
+  --duration-base: 220ms;
+  --duration-slow: 400ms;
+
+  /* ---- Layout ---- */
+  --container-max: 1280px;
+  --container-pad: clamp(20px, 5vw, 64px);
+  /* The header shows the full nav from this width and the menu button below it.
+     Media queries can't read a custom property, so 1240px is repeated in site.css. */
+}

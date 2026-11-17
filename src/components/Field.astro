@@ -1,0 +1,25 @@
+---
+/** The design system's Input and Textarea: a labelled form field. */
+interface Props {
+  label: string;
+  name: string;
+  type?: 'text' | 'email' | 'date';
+  placeholder?: string;
+  required?: boolean;
+  /** A number of rows makes this a textarea. */
+  rows?: number;
+  autocomplete?: string;
+}
+const { label, name, type = 'text', placeholder, required = false, rows, autocomplete } = Astro.props;
+---
+
+<label class="field">
+  <span class="field-label">{label}{required && <span class="req" aria-hidden="true"> *</span>}</span>
+  {
+    rows ? (
+      <textarea name={name} placeholder={placeholder} rows={rows} required={required} />
+    ) : (
+      <input name={name} type={type} placeholder={placeholder} required={required} autocomplete={autocomplete} />
+    )
+  }
+</label>

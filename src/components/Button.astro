@@ -1,0 +1,29 @@
+---
+/**
+ * The design system's Button. Renders a link when `href` is given, a button otherwise,
+ * so calls to action still work without JavaScript.
+ */
+interface Props {
+  variant?: 'primary' | 'secondary';
+  size?: 'sm' | 'md' | 'lg';
+  onDark?: boolean;
+  href?: string;
+  newTab?: boolean;
+  type?: 'button' | 'submit';
+  [attr: `data-${string}`]: string | undefined;
+}
+const { variant = 'primary', size = 'md', onDark = false, href, newTab = false, type = 'button', ...rest } = Astro.props;
+const cls = ['btn', `btn-${variant}`, size !== 'md' && `btn-${size}`, onDark && 'btn-on-dark'];
+---
+
+{
+  href ? (
+    <a class:list={cls} href={href} target={newTab ? '_blank' : undefined} rel={newTab ? 'noopener' : undefined} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button class:list={cls} type={type} {...rest}>
+      <slot />
+    </button>
+  )
+}
