@@ -159,6 +159,36 @@ for (const p of pages) {
       await context.close();
     });
 
+    test('contact form: Instagram copies the request and opens the DM', async ({ page, context }) => {
+      await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+      // Answer for Instagram locally: the test never contacts it.
+      await context.route(/^https?:\/\/(?!localhost)/, (route) => route.fulfill({ status: 200, body: 'ok' }));
+      await page.goto(p.path);
+      const form = page.locator('[data-contact-form]');
+      await form.locator('[name="name"]').fill('Test Person');
+      await form.locator('[name="email"]').fill('test@example.com');
+      await form.locator('[name="date"]').fill('2027-01-15');
+      await form.locator('[name="message"]').fill('Wedding, 60 guests');
+      const popup = page.waitForEvent('popup');
+      await form.locator('[data-via="instagram"]').click();
+      const dm = await popup;
+      await dm.waitForLoadState();
+      expect(dm.url()).toContain('ig.me/m/cakeonstick');
+      await expect(form.locator('[data-form-success]')).toBeVisible();
+      const copied = await page.evaluate(() => navigator.clipboard.readText());
+      for (const part of ['Test Person', 'test@example.com', '2027-01-15', 'Wedding, 60 guests']) {
+        expect(copied).toContain(part);
+      }
+    });
+
+    test('LINE buttons use the official add-friend link', async ({ page }) => {
+      await page.goto(p.path);
+      await expect(page.locator('.hero [data-line]')).toHaveAttribute(
+        'href',
+        'https://line.me/R/ti/p/@544zacuj?ts=07242156&oat_content=url',
+      );
+    });
+
     test('the #nutrition link lands on the nutrition facts', async ({ page }) => {
       await page.goto(p.path + '#nutrition');
       await expect(page.locator('#nutrition h2')).toBeInViewport();
@@ -196,6 +226,25 @@ test.describe('language', () => {
     await expect(page.locator('html')).toHaveAttribute('lang', 'zh-Hant-TW');
     await context.close();
   });
+
+  // The browser's language list decides: the first Chinese or English entry wins,
+  // and a browser with neither gets English.
+  for (const [languages, expected] of [
+    [['fr-FR', 'de'], 'en'],
+    [['ja', 'zh-TW', 'en'], 'zh-Hant-TW'],
+    [['en-US', 'zh-TW'], 'en'],
+    [['zh-TW', 'en-US'], 'zh-Hant-TW'],
+    [['zh-CN'], 'zh-Hant-TW'],
+  ] as const) {
+    test(`browser languages ${languages.join(', ')} -> ${expected}`, async ({ page }) => {
+      await page.addInitScript((list) => {
+        Object.defineProperty(navigator, 'languages', { get: () => list });
+        Object.defineProperty(navigator, 'language', { get: () => list[0] });
+      }, languages);
+      await page.goto('./');
+      await expect(page.locator('html')).toHaveAttribute('lang', expected);
+    });
+  }
 
   test('a Chinese browser stays on the Chinese page; choosing EN is remembered', async ({ page }) => {
     await page.goto('./');

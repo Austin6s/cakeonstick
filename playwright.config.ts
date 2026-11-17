@@ -2,7 +2,7 @@ import { defineConfig } from '@playwright/test';
 
 // Tests run against the built site (`npm run build` first), served the way it is
 // deployed: under the base path.
-const base = process.env.BASE_PATH ?? '/cakeonstick/';
+const base = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({
   testDir: 'tests',

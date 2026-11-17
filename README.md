@@ -6,8 +6,8 @@ as a pre-written message the visitor sends on LINE or Instagram, or from the con
 
 | | Address | Branch |
 |---|---|---|
-| Production | https://austin6s.github.io/cakeonstick/ (English: `/en/`) | `main` |
-| Dev | https://austin6s.github.io/cakeonstick/dev/ | `dev` |
+| Production | https://cakeonstick.com/ (English: `/en/`) | `main` |
+| Dev | https://cakeonstick.com/dev/ | `dev` |
 
 The dev copy tells search engines not to index it.
 
@@ -30,7 +30,7 @@ Needs Node 22.23 or newer (CI uses 24).
 
 ```
 npm install
-npm run dev        # local site with live reload, at http://localhost:4321/cakeonstick/
+npm run dev        # local site with live reload, at http://localhost:4321/
 npm run check      # everything CI runs: type check, build, site check, browser tests
 ```
 
@@ -58,51 +58,36 @@ The checks that must pass before anything is published:
   Instagram copy); carousels; the contact form; the language redirect and memory; the
   `#nutrition` link; and that the page renders with JavaScript off.
 
-### Moving to cakeonstick.com
+### The domain
 
-The owner holds `cakeonstick.com` at Namecheap (17 Nov 2026: still on Namecheap's parking
-page). Do these in order; the site stays up on github.io until step 3.
+The site is served at `cakeonstick.com`, bought at Namecheap. Its DNS records there
+(Advanced DNS) point at GitHub Pages and should not need touching:
 
-1. At Namecheap > Domain List > Manage > Advanced DNS, delete the parking records (the
-   "URL Redirect" for `@` and the `CNAME` for `www` to parkingpage.namecheap.com), then add:
+| Type | Host | Value |
+|---|---|---|
+| A | `@` | `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153` (four records) |
+| CNAME | `www` | `austin6s.github.io.` |
 
-   | Type | Host | Value |
-   |---|---|---|
-   | A | `@` | `185.199.108.153` |
-   | A | `@` | `185.199.109.153` |
-   | A | `@` | `185.199.110.153` |
-   | A | `@` | `185.199.111.153` |
-   | CNAME | `www` | `austin6s.github.io.` |
-
-2. Wait until `cakeonstick.com` answers from GitHub (minutes to an hour):
-   `curl -sI http://cakeonstick.com | grep -i server` should say `GitHub.com`.
-3. Set the two repository variables and redeploy both branches:
-
-   ```
-   gh variable set SITE_URL --body https://cakeonstick.com
-   gh variable set BASE_PATH --body /
-   gh workflow run "CI and deploy" --ref main
-   gh workflow run "CI and deploy" --ref dev
-   ```
-
-   The deploy writes the `CNAME` file that tells GitHub Pages the domain. Production is
-   then `https://cakeonstick.com/` and dev is `https://cakeonstick.com/dev/`.
-4. In the repository's Settings > Pages, tick "Enforce HTTPS" once GitHub has issued the
-   certificate (usually within the hour).
+Each deploy writes the `CNAME` file that tells GitHub Pages the domain. `www.cakeonstick.com`
+and the old `austin6s.github.io/cakeonstick/` address both redirect to `cakeonstick.com`.
+The address is set in `astro.config.mjs` and the workflow; the repository variables
+`SITE_URL` and `BASE_PATH` override it if they are ever created.
 
 ## How it is built
 
 - [Astro](https://astro.build), TypeScript, no client framework. Each language is a real
   pre-rendered page (`/` and `/en/`) with `hreflang` links.
 - Language: the 中文 / EN switch is a link, and the choice is remembered in the browser.
-  On a first visit to `/`, a browser that is not set to Chinese is sent to `/en/`. No
-  location lookup, nothing sent anywhere.
+  Until a visitor chooses, `/` follows the browser's language list: the first entry that is
+  Chinese or English wins, and a browser with neither gets English (`/en/`). A link straight
+  to `/en/` always shows English. No location lookup, nothing sent anywhere.
 - Photos are compressed to AVIF and WebP in several sizes at build time.
 - Fonts: Poppins and Inter are served from the site itself. Chinese text uses the Chinese
   font already on the visitor's device (downloading Noto Sans TC cost about 1.2 MB).
 - The quick-order dialog is a native `<dialog>`.
 - The contact form sends nothing to a server. It writes the message and opens LINE
-  (pre-filled) or the visitor's mail app.
+  (pre-filled), the visitor's mail app (pre-filled) or the Instagram DM (the message is
+  copied to paste in, because Instagram cannot be pre-filled).
 
 `cake-on-stick-handoff/` is the original design handoff (the prototype, design system and
 source images). It is kept for reference and is not part of the build.
@@ -120,5 +105,3 @@ source images). It is kept for reference and is not part of the build.
 4. **Card photo shape.** Cards show a 4:3 window of 4:5 photos, as designed. The current
    photos have enough margin that nothing is cut off.
 5. **Analytics.** None is installed.
-6. **Domain.** The site is on a github.io address until `cakeonstick.com` is pointed at it
-   ("Moving to cakeonstick.com" above; step 1 is the owner's, at Namecheap).

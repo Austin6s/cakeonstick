@@ -1,15 +1,14 @@
 name: CI and deploy
 
-# dev  -> the dev environment   https://austin6s.github.io/cakeonstick/dev/
-# main -> production            https://austin6s.github.io/cakeonstick/
+# dev  -> the dev environment   https://cakeonstick.com/dev/
+# main -> production            https://cakeonstick.com/
 #
 # Every push and pull request is built and tested. A push to dev or main is then
 # published to its own part of the gh-pages branch (see scripts/publish.sh) and the
 # live page is checked to be the new version.
 #
-# The address comes from two repository variables, SITE_URL and BASE_PATH. Unset, the
-# site is served from github.io as above. For the site's own domain (README, "Moving to
-# cakeonstick.com") they are https://cakeonstick.com and /, and dev becomes /dev/.
+# The address is set here (SITE and BASE below). The repository variables SITE_URL and
+# BASE_PATH override it if they exist; normally they don't.
 
 on:
   push:
@@ -43,8 +42,8 @@ jobs:
       - name: Choose the environment
         id: env
         env:
-          SITE: ${{ vars.SITE_URL || 'https://austin6s.github.io' }}
-          BASE: ${{ vars.BASE_PATH || '/cakeonstick/' }}
+          SITE: ${{ vars.SITE_URL || 'https://cakeonstick.com' }}
+          BASE: ${{ vars.BASE_PATH || '/' }}
         run: |
           if [ "$GITHUB_REF" = "refs/heads/main" ]; then target=production; base="$BASE"; else target=dev; base="${BASE}dev/"; fi
           {

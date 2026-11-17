@@ -256,8 +256,9 @@ const followTiles = [
           </div>
           <p class="contact-p is-last">{t.contactP3}</p>
         </div>
-        <!-- The form sends nothing to a server: it writes the message and hands it to
-             LINE or to the visitor's mail app. Without JavaScript it falls back to mail. -->
+        <!-- The form sends nothing to a server: it writes the message and hands it to LINE
+             (pre-filled), Instagram (copied, then the DM opens: Instagram can't be pre-filled)
+             or the visitor's mail app (pre-filled). Without JavaScript it falls back to mail. -->
         <form
           class="contact-form"
           action={links.mailto}
@@ -266,11 +267,13 @@ const followTiles = [
           data-contact-form
           data-line-id={settings.lineId}
           data-email={settings.contactEmail}
+          data-ig-url={links.igDmUrl}
           data-subject-prefix={t.formSubjectPrefix}
           data-name-line={t.formNameLine}
           data-date-line={t.formDateLine}
           data-no-details={t.formNoDetails}
           data-success-line={t.formSuccessLine}
+          data-success-ig={t.formSuccessIg}
           data-success-email={t.formSuccessEmail}
         >
           <Field label={t.formName} name="name" placeholder={t.formNamePh} required autocomplete="name" />
@@ -279,6 +282,7 @@ const followTiles = [
           <Field label={t.formMessage} name="message" placeholder={t.formMessagePh} rows={4} />
           <div class="form-actions">
             <button class="btn-line" type="submit" data-via="line">{t.formSendLine}</button>
+            <Button variant="primary" size="lg" type="submit" data-via="instagram">{t.formSendIg}</Button>
             <button class="btn-outline" type="submit" data-via="email">{t.formSendEmail}</button>
           </div>
           <p class="form-status is-error" role="alert" data-form-error hidden>{t.formError}</p>

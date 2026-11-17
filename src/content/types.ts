@@ -123,9 +123,11 @@ export interface Strings {
   formMessage: string;
   formMessagePh: string;
   formSendLine: string;
+  formSendIg: string;
   formSendEmail: string;
   formError: string;
   formSuccessLine: string;
+  formSuccessIg: string;
   formSuccessEmail: string;
   formSubjectPrefix: string;
   formNameLine: string;

@@ -21,7 +21,7 @@ const errors = [];
 const fail = (msg) => errors.push(msg);
 const read = (file) => readFileSync(join(dist, file), 'utf8');
 
-const siteUrl = new URL(process.env.SITE_URL ?? 'https://austin6s.github.io');
+const siteUrl = new URL(process.env.SITE_URL ?? 'https://cakeonstick.com');
 const allowed = (host) => host === siteUrl.hostname || LINK_HOSTS.has(host) || NAME_ONLY_HOSTS.has(host);
 
 const pages = [

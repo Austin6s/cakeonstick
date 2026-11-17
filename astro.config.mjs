@@ -1,10 +1,9 @@
 import { defineConfig, envField } from 'astro/config';
 
-// Where the site is served. Production: https://austin6s.github.io/cakeonstick/
-// The dev environment is the same site under /cakeonstick/dev/ (set by the deploy workflow).
-// With a custom domain later, set SITE_URL to it and BASE_PATH to "/".
-const site = process.env.SITE_URL ?? 'https://austin6s.github.io';
-const base = process.env.BASE_PATH ?? '/cakeonstick/';
+// Where the site is served. Production: https://cakeonstick.com/
+// The dev environment is the same site under /dev/ (BASE_PATH is set by the deploy workflow).
+const site = process.env.SITE_URL ?? 'https://cakeonstick.com';
+const base = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({
   site,

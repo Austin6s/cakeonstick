@@ -17,8 +17,9 @@ export const links = {
   igHandle: `@${handle}`,
   igUrl: `https://instagram.com/${handle}`,
   igDmUrl: `https://ig.me/m/${handle}`,
-  lineAddPath: `ti/p/${encodeURIComponent(settings.lineId)}`,
-  lineAddUrl: `https://line.me/R/ti/p/${encodeURIComponent(settings.lineId)}`,
+  lineAddUrl: settings.lineAddUrl,
+  /** The same link without the https://line.me/R/ prefix, for opening the LINE app. */
+  lineAddPath: settings.lineAddUrl.replace('https://line.me/R/', ''),
   lineMessagePath: (text: string) =>
     `oaMessage/${encodeURIComponent(settings.lineId)}/?${encodeURIComponent(text)}`,
   mailto: `mailto:${settings.contactEmail}`,

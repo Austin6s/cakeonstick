@@ -131,7 +131,7 @@ for (const media of all<HTMLElement>('[data-carousel]')) {
   );
 }
 
-// ---------- Contact form: write the message, hand it to LINE or the mail app ----------
+// ---------- Contact form: write the message, hand it to LINE, Instagram or the mail app ----------
 const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
 if (form) {
   const errorEl = form.querySelector<HTMLElement>('[data-form-error]');
@@ -160,10 +160,14 @@ if (form) {
     lines.push('', message || (d.noDetails ?? ''));
     const body = lines.join('\n');
 
-    const via = (event.submitter as HTMLElement | null)?.dataset.via === 'email' ? 'email' : 'line';
+    const via = (event.submitter as HTMLElement | null)?.dataset.via ?? 'line';
     if (via === 'email') {
       window.location.href =
         'mailto:' + (d.email ?? '') + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    } else if (via === 'instagram') {
+      // Instagram can't be pre-filled: copy the message, then open the DM.
+      copyText(subject + '\n' + body);
+      window.open(d.igUrl ?? '', '_blank', 'noopener');
     } else {
       openLineUri(
         'oaMessage/' + encodeURIComponent(d.lineId ?? '') + '/?' + encodeURIComponent(subject + '\n' + body),
@@ -172,7 +176,8 @@ if (form) {
 
     if (errorEl) errorEl.hidden = true;
     if (successEl) {
-      successEl.textContent = (via === 'email' ? d.successEmail : d.successLine) ?? '';
+      successEl.textContent =
+        (via === 'email' ? d.successEmail : via === 'instagram' ? d.successIg : d.successLine) ?? '';
       successEl.hidden = false;
     }
   });

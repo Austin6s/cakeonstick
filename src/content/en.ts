@@ -75,10 +75,13 @@ export const en: SiteContent = {
     formMessage: 'Tell us about your event',
     formMessagePh: 'Theme, guest count, flavors...',
     formSendLine: 'Send on LINE',
+    formSendIg: 'Send on Instagram',
     formSendEmail: 'Send by email',
     formError: 'Please add your name and a valid email so we can reply.',
     formSuccessLine:
       "Thanks! LINE should have opened with your request — just hit send, and we'll be in touch within 1–2 days.",
+    formSuccessIg:
+      "Thanks! Your request is copied — paste it into the Instagram DM and send, and we'll be in touch within 1–2 days.",
     formSuccessEmail:
       "Thanks! Your email app should have opened with your request — just hit send, and we'll be in touch within 1–2 days.",
     formSubjectPrefix: 'Custom order request — ',

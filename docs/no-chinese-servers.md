@@ -1,9 +1,9 @@
 # No Chinese servers: cakeonstick
 
-## State on 17 November 2026 (first build)
+## State on 17 November 2026 (first build, then moved to cakeonstick.com the same day)
 
 **What it is:** a static website (HTML, CSS, images, two fonts, one small script) in the
-public GitHub repository `Austin6s/cakeonstick`, served by GitHub Pages. There is no
+public GitHub repository `Austin6s/cakeonstick`, served by GitHub Pages at `cakeonstick.com`. There is no
 database, no server code, no analytics, no form service and no AI.
 
 **What data exists:** none is collected or stored. The site sets one value in the visitor's
@@ -15,6 +15,7 @@ it writes a message and opens LINE or the visitor's mail app.
 | Part | Who runs it | Where | Note |
 |---|---|---|---|
 | Hosting | GitHub Pages (GitHub, US), delivered through Fastly's network | Fastly picks the nearest location | Measured from Taiwan on 17 Nov 2026: Singapore (`x-served-by: cache-sin-…`, `x-github-edge-region: southeastasia`) on every request. |
+| Domain and DNS | Namecheap (US) | | `cakeonstick.com`: four A records and a `www` CNAME pointing at GitHub Pages. No email or other service is attached to the domain. |
 | Build and deploy | GitHub Actions (GitHub-hosted runners, US) | | Build time only; no visitor data. |
 | Fonts | The site itself | | Poppins and Inter are npm packages built into the site. The prototype's Google Fonts link was removed. Chinese text uses the device's own font. |
 | Language detection | The visitor's browser | | The prototype's call to `ipapi.co` (which sent every visitor's IP address to a third party) was removed. |
