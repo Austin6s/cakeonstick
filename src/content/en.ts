@@ -83,15 +83,18 @@ export const en: SiteContent = {
     formError: 'Please add your name and a valid email so we can reply.',
     formSuccessLine:
       "Thanks! LINE should have opened with your request — just hit send, and we'll be in touch within 1–2 days.",
-    formSuccessLineCopied:
-      "Thanks! Your request is copied — add us on LINE, paste it in the chat and send, and we'll be in touch within 1–2 days.",
+    formSuccessLineDesktop:
+      "Thanks! Your request is copied and LINE is opening — paste it in the chat and send, and we'll be in touch within 1–2 days.",
     formSuccessIg:
       "Thanks! Your request is copied — paste it into the Instagram DM and send, and we'll be in touch within 1–2 days.",
     formSuccessEmail:
       "Thanks! Your email app should have opened with your request — just hit send, and we'll be in touch within 1–2 days.",
     formEmailFallback: "If your email app didn't open, copy the message below and send it to {email}.",
-    formBlocked: 'Your browser blocked the new tab — use the button below to open it.',
+    formBlocked: 'Your browser blocked the new tab — use the link below to open it.',
     formOpenLine: 'Open LINE →',
+    lineQrLink: "LINE didn't open? Open the QR code →",
+    lineQrOpened:
+      "LINE doesn't seem to be on this computer, so we opened its QR code — scan it with LINE on your phone, then paste the message (it's copied).",
     formOpenIg: 'Open Instagram DM →',
     formOpenEmail: 'Open email app →',
     formSubjectPrefix: 'Custom order request — ',
@@ -115,7 +118,7 @@ export const en: SiteContent = {
     orderEmailCta: 'Order by email',
     orderEmailSubject: 'Order — ',
     orderIgCopied: 'Message copied — paste it in the DM and send.',
-    orderLineCopied: 'Message copied — add us on LINE, then paste it in the chat and send.',
+    orderLineDesktop: "Message copied and LINE is opening — if it doesn't fill the message in, paste it in the chat.",
     copyFailed: "We couldn't copy it automatically — please select the message and copy it yourself.",
     orderCancel: 'Cancel',
     copyBtn: 'Copy',

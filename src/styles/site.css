@@ -1459,6 +1459,12 @@ dialog.order::backdrop {
 .order-copied:empty {
   display: none;
 }
+.order-qr {
+  font-size: 13px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: -8px;
+}
 .order-copied {
   font-size: 13px;
   color: var(--coral-text);

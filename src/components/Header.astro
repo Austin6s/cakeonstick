@@ -36,7 +36,7 @@ const sections = [
         <a href={homePath('en')} lang="en" hreflang="en" data-lang="en" aria-current={lang === 'en' ? 'true' : undefined}>EN</a>
       </div>
       <a class="social" href={links.igUrl} target="_blank" rel="noopener">Instagram</a>
-      <a class="social is-line" href={links.lineAddUrl} target="_blank" rel="noopener">LINE</a>
+      <a class="social is-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line-add>LINE</a>
       <Button variant="primary" size="sm" href="#contact">{t.navCta}</Button>
     </div>
 
@@ -62,7 +62,7 @@ const sections = [
     {sections.map((s) => <a href={s.href}>{s.label}</a>)}
     <a href="#nutrition">{t.nutritionEyebrow}</a>
     <a class="is-ig" href={links.igUrl} target="_blank" rel="noopener">Instagram {links.igHandle}</a>
-    <a class="is-line" href={links.lineAddUrl} target="_blank" rel="noopener">LINE {settings.lineId}</a>
+    <a class="is-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line-add>LINE {settings.lineId}</a>
     <div class="cta">
       <Button variant="primary" size="lg" href="#contact">{t.heroCtaPrimary}</Button>
     </div>

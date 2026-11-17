@@ -129,12 +129,14 @@ export interface Strings {
   formSendEmail: string;
   formError: string;
   formSuccessLine: string;
-  formSuccessLineCopied: string;
+  formSuccessLineDesktop: string;
   formSuccessIg: string;
   formSuccessEmail: string;
   formEmailFallback: string;
   formBlocked: string;
   formOpenLine: string;
+  lineQrLink: string;
+  lineQrOpened: string;
   formOpenIg: string;
   formOpenEmail: string;
   formSubjectPrefix: string;
@@ -157,7 +159,7 @@ export interface Strings {
   orderEmailCta: string;
   orderEmailSubject: string;
   orderIgCopied: string;
-  orderLineCopied: string;
+  orderLineDesktop: string;
   copyFailed: string;
   orderCancel: string;
   copyBtn: string;

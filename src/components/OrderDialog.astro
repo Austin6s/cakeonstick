@@ -5,9 +5,9 @@
  * to the button that opened it.
  *
  * The three ways to order are real links, so no pop-up blocker can stop them:
- *  - LINE: on a phone the chat opens with the message typed in. LINE does not do that
- *    on a computer, so there the message is copied and the add-friend page opens
- *    (src/scripts/site.ts switches the link).
+ *  - LINE: on a phone the chat opens with the message typed in. On a computer the
+ *    message is copied and the LINE desktop app is opened; if it isn't installed, the
+ *    add-friend QR page opens instead (src/scripts/site.ts).
  *  - Instagram: a DM can't be pre-filled, so the message is copied and the DM opens.
  *  - Email: the visitor's default mail app opens with the subject and message filled in.
  * The message and a Copy button are always shown, in case an app does not open.
@@ -79,8 +79,11 @@ const { id, name, priceDisplay, photo, flavors = [], message, t } = Astro.props;
           target="_blank"
           rel="noopener"
           data-line-message
+          data-app-url={links.lineAppMessageUrl(message)}
           data-add-url={links.lineAddUrl}
-          data-copied={t.orderLineCopied}
+          data-desktop={t.orderLineDesktop}
+          data-qr-opened={t.lineQrOpened}
+          data-blocked={t.formBlocked}
         >
           {t.orderLineCta}
         </a>
@@ -92,6 +95,7 @@ const { id, name, priceDisplay, photo, flavors = [], message, t } = Astro.props;
         </a>
       </div>
       <p class="order-copied" role="status" data-status data-copy-failed={t.copyFailed}></p>
+      <a class="order-qr" href={links.lineAddUrl} target="_blank" rel="noopener" data-line-qr hidden>{t.lineQrLink}</a>
       <button class="order-cancel" type="button" data-close>{t.orderCancel}</button>
     </div>
   </div>

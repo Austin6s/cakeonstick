@@ -4,8 +4,9 @@
 //
 // How a message reaches each app (the same rules for quick order and the contact form):
 //   LINE on a phone     the chat opens with the message typed in (line.me/R/oaMessage).
-//   LINE on a computer  LINE ignores that link there, so the message is copied and the
-//                       add-friend page (a QR code) opens.
+//   LINE on a computer  that web link only reaches LINE's home page there, so the message
+//                       is copied and the LINE desktop app is opened (line://). If the app
+//                       doesn't open, the add-friend page with the QR code opens instead.
 //   Instagram           a DM can't be pre-filled: the message is copied and the DM opens.
 //   Email               mailto: opens the visitor's default mail app, pre-filled.
 // The message is always shown with a Copy button, so nothing is lost if an app or a new
@@ -70,6 +71,41 @@ function openTab(url: string): boolean {
   return true;
 }
 
+/** How long to wait for the LINE desktop app before deciding it isn't installed. */
+const LINE_APP_WAIT_MS = 1500;
+
+/**
+ * Computers only: opens the LINE desktop app at `appUrl` (a line:// address). If this
+ * page still has the focus after a moment, the app didn't open (most likely it isn't
+ * installed), so the add-friend QR page `qrUrl` opens in a new tab instead.
+ * `done` hears 'app' (LINE took over), 'qr' (the QR page opened) or 'blocked' (a pop-up
+ * blocker stopped the QR page). Must be called inside the visitor's tap.
+ */
+function openLineApp(appUrl: string, qrUrl: string, near: HTMLElement, done: (result: 'app' | 'qr' | 'blocked') => void) {
+  let left = false;
+  const leave = () => {
+    left = true;
+  };
+  // Opening the app (or the browser's "Open LINE?" prompt) takes the focus from the page.
+  window.addEventListener('blur', leave);
+  document.addEventListener('visibilitychange', leave);
+
+  // A link click, not location.href: a browser that can't open line:// then stays here.
+  const link = document.createElement('a');
+  link.href = appUrl;
+  link.hidden = true;
+  near.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => {
+    window.removeEventListener('blur', leave);
+    document.removeEventListener('visibilitychange', leave);
+    if (left || document.hidden) return done('app');
+    done(openTab(qrUrl) ? 'qr' : 'blocked');
+  }, LINE_APP_WAIT_MS);
+}
+
 /** A Copy button: copies, shows "Copied" for two seconds, or says it could not. */
 function wireCopyButton(button: HTMLButtonElement, getText: () => string, near: HTMLElement, onFail: () => void) {
   let timer: ReturnType<typeof setTimeout> | undefined;
@@ -95,6 +131,21 @@ for (const link of all<HTMLAnchorElement>('[data-lang]')) {
     }
     link.href = link.href.split('#')[0] + location.hash;
   });
+}
+
+// ---------- LINE add-friend buttons: on a computer, try the desktop app first ----------
+if (!isPhone) {
+  for (const link of all<HTMLAnchorElement>('[data-line-add]')) {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const qrUrl = link.href;
+      const appUrl = 'line://' + new URL(qrUrl).pathname.replace(/^\/R\//, '');
+      openLineApp(appUrl, qrUrl, document.body, (result) => {
+        // No tab could open: show the QR page here instead.
+        if (result === 'blocked') window.location.href = qrUrl;
+      });
+    });
+  }
 }
 
 // ---------- Mobile menu ----------
@@ -147,14 +198,27 @@ for (const dialog of all<HTMLDialogElement>('dialog.order')) {
   const copyButton = dialog.querySelector<HTMLButtonElement>('[data-copy]');
   if (copyButton) wireCopyButton(copyButton, () => message, dialog, sayCopyFailed);
 
-  // On a computer LINE can't take a typed-in message: copy it and open the add-friend page.
+  // LINE on a computer: copy the message, open the desktop app, or else the QR page.
   const lineLink = dialog.querySelector<HTMLAnchorElement>('[data-line-message]');
+  const qrLink = dialog.querySelector<HTMLAnchorElement>('[data-line-qr]');
   if (lineLink && !isPhone) {
-    lineLink.href = lineLink.dataset.addUrl ?? lineLink.href;
-    lineLink.setAttribute('data-copy-first', '');
+    const ld = lineLink.dataset;
+    lineLink.href = ld.addUrl ?? lineLink.href; // what a middle click or new tab gets
+    lineLink.addEventListener('click', (event) => {
+      event.preventDefault();
+      void copyText(message, dialog).then((ok) => say(ok ? ld.desktop : status?.dataset.copyFailed));
+      if (qrLink) qrLink.hidden = false; // the way out if neither the app nor the QR page shows
+      openLineApp(ld.appUrl ?? '', ld.addUrl ?? '', dialog, (result) => {
+        if (result === 'qr') say(ld.qrOpened);
+        if (result === 'blocked') say(ld.blocked);
+      });
+    });
   }
+  dialog.addEventListener('close', () => {
+    if (qrLink) qrLink.hidden = true;
+  });
 
-  // "Copy first" links copy the message as they open (Instagram always, LINE on a computer).
+  // "Copy first" links copy the message as they open (Instagram).
   for (const link of all<HTMLAnchorElement>('[data-copy-first]', dialog)) {
     link.addEventListener('click', () => {
       void copyText(message, dialog).then((ok) => (ok ? say(link.dataset.copied) : sayCopyFailed()));
@@ -261,17 +325,24 @@ if (form) {
       success = d.successLine;
       openLabel = d.openLine;
     } else {
+      // A computer: the desktop app, or else the QR page (see openLineApp).
       url = d.lineAddUrl ?? '';
       copyFirst = true;
-      success = d.successLineCopied;
-      openLabel = d.openLine;
+      success = d.successLineDesktop;
+      openLabel = d.lineQrLink;
     }
+    const lineApp = via === 'line' && !isPhone;
 
     // Copy first (while this page still has the focus), then open the app.
     const copied = copyFirst ? copyText(text, form) : Promise.resolve(true);
     let opened = true;
     if (via === 'email') window.location.href = url;
-    else opened = openTab(url);
+    else if (lineApp) {
+      openLineApp((d.lineAppUrl ?? '') + encodeURIComponent(text), url, form, (outcome) => {
+        if (!statusEl || outcome === 'app') return;
+        statusEl.textContent = outcome === 'qr' ? (d.lineQrOpened ?? '') : (d.blocked ?? '');
+      });
+    } else opened = openTab(url);
 
     if (errorEl) errorEl.hidden = true;
     if (messageEl) messageEl.textContent = text;

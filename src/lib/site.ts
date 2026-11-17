@@ -27,11 +27,14 @@ export const links = {
   lineAddUrl: settings.lineAddUrl,
   /**
    * Opens a LINE chat with the account and `text` typed in, ready to send. LINE only
-   * honours this on phones and tablets; on a computer it redirects to LINE's home page,
-   * so the page copies the message and opens the add-friend link there instead.
+   * honours this web link on phones and tablets; on a computer it goes to LINE's home
+   * page, so there the page opens the desktop app instead (lineAppMessageUrl) and falls
+   * back to the add-friend QR page (lineAddUrl).
    */
   lineMessageUrl: (text: string) =>
     `https://line.me/R/oaMessage/${settings.lineId}/?${encodeURIComponent(text)}`,
+  /** The LINE desktop app: the account's chat, with `text` typed in. */
+  lineAppMessageUrl: (text: string) => `line://oaMessage/${settings.lineId}/${encodeURIComponent(text)}`,
   mailto: `mailto:${settings.contactEmail}`,
   /** Opens the visitor's default mail app with the subject and body filled in. */
   mailtoWith: (subject: string, body: string) =>

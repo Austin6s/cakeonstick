@@ -15,19 +15,36 @@ const IPHONE =
 
 /**
  * Stands in for LINE, Instagram and the mail app: every request that would leave the
- * site is answered locally, and whatever the page copies is recorded (reading the real
- * clipboard is not possible in every browser engine).
+ * site is answered locally, whatever the page copies is recorded (reading the real
+ * clipboard is not possible in every browser engine), and attempts to open the LINE
+ * desktop app (line:// links) are recorded instead of handed to the system. With no app
+ * opening, the page keeps the focus: the same as a computer without LINE.
  */
 async function isolate(context: BrowserContext) {
   await context.route(/^https?:\/\/(?!localhost)/, (route) => route.fulfill({ status: 200, body: 'ok' }));
   await context.addInitScript(() => {
-    const state = { copied: [] as string[] };
+    const state = { copied: [] as string[], app: [] as string[] };
     (window as unknown as { __test: typeof state }).__test = state;
     document.addEventListener('copy', () => state.copied.push(String(document.getSelection())), true);
+    window.addEventListener(
+      'click',
+      (event) => {
+        const link = (event.target as Element | null)?.closest?.('a');
+        if (link && link.href.startsWith('line:')) {
+          state.app.push(link.href);
+          event.preventDefault();
+        }
+      },
+      true,
+    );
   });
 }
-const copied = (page: Page) =>
-  page.evaluate(() => (window as unknown as { __test: { copied: string[] } }).__test.copied);
+type TestState = { copied: string[]; app: string[] };
+const copied = (page: Page) => page.evaluate(() => (window as unknown as { __test: TestState }).__test.copied);
+const appOpened = (page: Page) => page.evaluate(() => (window as unknown as { __test: TestState }).__test.app);
+/** What the LINE desktop app taking over looks like to the page. */
+const lineAppTakesFocus = (page: Page) => page.evaluate(() => window.dispatchEvent(new Event('blur')));
+const LINE_APP_WAIT_MS = 1500;
 
 /** A page as a phone sees it (LINE can be pre-filled there). */
 async function phonePage(browser: Browser) {
@@ -148,17 +165,36 @@ for (const p of pages) {
       await context.close();
     });
 
-    test('quick order by LINE on a computer: copies the message, opens the add-friend page', async ({ page }) => {
+    test('quick order by LINE on a computer without LINE: tries the app, then opens the QR page', async ({ page }) => {
       await page.goto(p.path);
       await page.locator('[data-order="set-classic"]').click();
       const dialog = page.locator('#order-set-classic');
+      const message = (await dialog.getAttribute('data-message'))!;
       const line = dialog.locator('[data-line-message]');
-      await expect(line).toHaveAttribute('href', LINE_ADD);
+      await expect(line).toHaveAttribute('href', LINE_ADD); // a middle click gets the QR page
       const popup = page.waitForEvent('popup');
       await line.click();
+      expect(await appOpened(page)).toEqual(['line://oaMessage/@544zacuj/' + encodeURIComponent(message)]);
+      expect(await copied(page)).toEqual([message]);
+      await expect(dialog.locator('[data-line-qr]')).toBeVisible();
       expect((await popup).url()).toBe(LINE_ADD);
-      await expect(dialog.locator('[data-status]')).toHaveText(/LINE/);
-      expect(await copied(page)).toEqual([await dialog.getAttribute('data-message')]);
+      await expect(dialog.locator('[data-status]')).toHaveText((await line.getAttribute('data-qr-opened'))!);
+    });
+
+    test('quick order by LINE on a computer with LINE: the app opens and no QR page does', async ({ page }) => {
+      await page.goto(p.path);
+      await page.locator('[data-order="set-love"]').click();
+      const dialog = page.locator('#order-set-love');
+      const line = dialog.locator('[data-line-message]');
+      let popups = 0;
+      page.on('popup', () => popups++);
+      await line.click();
+      await lineAppTakesFocus(page);
+      await page.waitForTimeout(LINE_APP_WAIT_MS + 1000);
+      expect(popups).toBe(0);
+      expect(await appOpened(page)).toHaveLength(1);
+      await expect(dialog.locator('[data-status]')).toHaveText((await line.getAttribute('data-desktop'))!);
+      await expect(dialog.locator('[data-line-qr]')).toHaveAttribute('href', LINE_ADD);
     });
 
     test('quick order by Instagram: copies the message, opens the DM', async ({ page }) => {
@@ -227,16 +263,32 @@ for (const p of pages) {
       await context.close();
     });
 
-    test('contact form by LINE on a computer: copies the request, opens the add-friend page', async ({ page }) => {
+    test('contact form by LINE on a computer without LINE: tries the app, then opens the QR page', async ({ page }) => {
       await page.goto(p.path);
       const form = await fillForm(page);
       const popup = page.waitForEvent('popup');
       await form.locator('[data-via="line"]').click();
-      expect((await popup).url()).toBe(LINE_ADD);
-      await expect(form.locator('[data-form-result]')).toBeVisible();
-      await expect(form.locator('[data-form-open]')).toHaveAttribute('href', LINE_ADD);
       const text = (await copied(page))[0];
       for (const part of formParts) expect(text).toContain(part);
+      expect(await appOpened(page)).toEqual(['line://oaMessage/@544zacuj/' + encodeURIComponent(text)]);
+      await expect(form.locator('[data-form-result]')).toBeVisible();
+      await expect(form.locator('[data-form-open]')).toHaveAttribute('href', LINE_ADD);
+      expect((await popup).url()).toBe(LINE_ADD);
+      await expect(form.locator('[data-form-success]')).toHaveText((await form.getAttribute('data-line-qr-opened'))!);
+    });
+
+    test('contact form by LINE on a computer, QR page blocked: says so and links to it', async ({ page }) => {
+      await page.addInitScript(() => {
+        window.open = () => null; // what a pop-up blocker does
+      });
+      await page.goto(p.path);
+      const form = await fillForm(page);
+      await form.locator('[data-via="line"]').click();
+      await expect(form.locator('[data-form-success]')).toHaveText((await form.getAttribute('data-blocked'))!, {
+        timeout: LINE_APP_WAIT_MS + 3000,
+      });
+      await expect(form.locator('[data-form-open]')).toBeVisible();
+      await expect(form.locator('[data-form-open]')).toHaveAttribute('href', LINE_ADD);
     });
 
     test('contact form by Instagram: copies the request, opens the DM', async ({ page }) => {
@@ -286,6 +338,36 @@ for (const p of pages) {
     });
 
     // ---------- Everything else ----------
+
+    test('LINE add-friend button on a computer: tries the app, then opens the QR page', async ({ page }) => {
+      await page.goto(p.path);
+      const popup = page.waitForEvent('popup');
+      await page.locator('.hero .btn-line').click();
+      expect(await appOpened(page)).toEqual(['line://ti/p/@544zacuj']);
+      expect((await popup).url()).toBe(LINE_ADD);
+      await expect(page).toHaveURL(new RegExp(p.path.replace('./', '/') + '$')); // still on the site
+    });
+
+    test('LINE add-friend button on a computer with LINE: no QR page', async ({ page }) => {
+      await page.goto(p.path);
+      let popups = 0;
+      page.on('popup', () => popups++);
+      await page.locator('.channel.is-line').click();
+      await lineAppTakesFocus(page);
+      await page.waitForTimeout(LINE_APP_WAIT_MS + 1000);
+      expect(popups).toBe(0);
+      expect(await appOpened(page)).toEqual(['line://ti/p/@544zacuj']);
+    });
+
+    test('LINE add-friend buttons on a phone go straight to LINE', async ({ browser }) => {
+      const { context, page } = await phonePage(browser);
+      await page.goto(p.path);
+      const popup = page.waitForEvent('popup');
+      await page.locator('.hero .btn-line').click();
+      expect((await popup).url()).toBe(LINE_ADD);
+      expect(await appOpened(page)).toEqual([]);
+      await context.close();
+    });
 
     test('LINE add-friend buttons are plain links to the official address', async ({ page }) => {
       await page.goto(p.path);

@@ -97,7 +97,7 @@ The address is set in `astro.config.mjs` and the workflow; the repository variab
   | Channel | What happens |
   |---|---|
   | LINE on a phone or tablet | The chat with the account opens with the message typed in. |
-  | LINE on a computer | LINE does not accept a typed-in message there (its link just goes to LINE's home page), so the message is copied and the add-friend page with the QR code opens. |
+  | LINE on a computer | The message is copied and the LINE desktop app opens (LINE's web link for a typed-in message only works on phones). If the app doesn't open within 1.5 seconds, most likely because it isn't installed, the add-friend page with the QR code opens in a new tab. A "LINE didn't open? Open the QR code" link stays on screen either way. The add-friend buttons work the same way on a computer. |
   | Instagram | A DM cannot be pre-filled, so the message is copied and the DM opens. |
   | Email | The visitor's default mail app opens with the subject and message filled in (`mailto:`). |
 

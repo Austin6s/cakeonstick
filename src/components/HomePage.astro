@@ -78,7 +78,7 @@ const followTiles = [
           <div class="hero-ctas">
             <Button variant="primary" size="lg" href="#contact">{t.heroCtaPrimary}</Button>
             <Button variant="secondary" size="lg" onDark href={links.igUrl} newTab>{t.heroCtaSecondary}</Button>
-            <a class="btn-line" href={links.lineAddUrl} target="_blank" rel="noopener">{t.followLineCta}</a>
+            <a class="btn-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line-add>{t.followLineCta}</a>
           </div>
           <p class="hero-note">{t.heroNote}</p>
         </div>
@@ -128,7 +128,7 @@ const followTiles = [
         {t.shopNoteA}
         <a href={links.igUrl} target="_blank" rel="noopener">{links.igHandle}</a>
         {t.shopNoteB}
-        <a href={links.lineAddUrl} target="_blank" rel="noopener">LINE</a>{t.shopNoteC}
+        <a href={links.lineAddUrl} target="_blank" rel="noopener" data-line-add>LINE</a>{t.shopNoteC}
       </p>
     </section>
 
@@ -220,7 +220,7 @@ const followTiles = [
         </div>
         <div class="follow-ctas">
           <Button variant="primary" size="lg" href={links.igUrl} newTab>{t.followCta}</Button>
-          <a class="btn-line" href={links.lineAddUrl} target="_blank" rel="noopener">{t.followLineCta}</a>
+          <a class="btn-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line-add>{t.followLineCta}</a>
         </div>
       </div>
     </section>
@@ -252,7 +252,7 @@ const followTiles = [
           <p class="contact-p is-strong">{t.contactChannels}</p>
           <div class="contact-channels">
             <a class="channel is-ig" href={links.igUrl} target="_blank" rel="noopener">{t.contactIgBtn}</a>
-            <a class="channel is-line" href={links.lineAddUrl} target="_blank" rel="noopener">{t.contactLineBtn}</a>
+            <a class="channel is-line" href={links.lineAddUrl} target="_blank" rel="noopener" data-line-add>{t.contactLineBtn}</a>
             <a class="channel is-email" href={links.mailto}>{t.contactEmailBtn}</a>
           </div>
           <p class="contact-p is-last">{t.contactP3}</p>
@@ -269,6 +269,7 @@ const followTiles = [
           enctype="text/plain"
           data-contact-form
           data-line-message-url={links.lineMessageUrl('')}
+          data-line-app-url={links.lineAppMessageUrl('')}
           data-line-add-url={links.lineAddUrl}
           data-email={settings.contactEmail}
           data-ig-url={links.igDmUrl}
@@ -277,7 +278,9 @@ const followTiles = [
           data-date-line={t.formDateLine}
           data-no-details={t.formNoDetails}
           data-success-line={t.formSuccessLine}
-          data-success-line-copied={t.formSuccessLineCopied}
+          data-success-line-desktop={t.formSuccessLineDesktop}
+          data-line-qr-opened={t.lineQrOpened}
+          data-line-qr-link={t.lineQrLink}
           data-success-ig={t.formSuccessIg}
           data-success-email={`${t.formSuccessEmail} ${t.formEmailFallback.replace('{email}', settings.contactEmail)}`}
           data-blocked={t.formBlocked}

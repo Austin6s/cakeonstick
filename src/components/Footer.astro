@@ -39,7 +39,7 @@ const { t } = Astro.props;
         <p class="footer-head">{t.footerFollowHead}</p>
         <div class="footer-links is-follow">
           <a href={links.igUrl} target="_blank" rel="noopener">Instagram {links.igHandle}</a>
-          <a href={links.lineAddUrl} target="_blank" rel="noopener">LINE {settings.lineId}</a>
+          <a href={links.lineAddUrl} target="_blank" rel="noopener" data-line-add>LINE {settings.lineId}</a>
         </div>
       </div>
     </div>
