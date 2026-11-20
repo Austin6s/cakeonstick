@@ -5,7 +5,7 @@
 // The last two are this repo's "no Chinese servers" guard: the site is static files
 // only, so the one way visitor data could reach another server is a third-party
 // resource or endpoint slipping in. Adding a host here means finding out where it
-// runs first (see CLAUDE.md and docs/no-chinese-servers.md).
+// runs first (see AGENTS.md and docs/no-chinese-servers.md).
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 

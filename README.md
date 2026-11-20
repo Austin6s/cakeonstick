@@ -55,7 +55,7 @@ The checks that must pass before anything is published:
 - `scripts/check-site.mjs`: both pages exist with the right language, SEO and sharing
   tags; the dev build is noindex and production is not; **nothing loads from another
   host** and every URL in the output is on a short known list. This is the repo's
-  "no Chinese servers" guard (see `CLAUDE.md`).
+  "no Chinese servers" guard (see `AGENTS.md`).
 - `tests/site.spec.ts` (Playwright, in the Chrome, Firefox and Safari engines): no sideways
   scrolling at 360, 768, 1280 and 1440 px; the header breakpoint; the quick-order dialog
   (focus, Esc, backdrop); every way to order and to send the form (LINE on a phone, LINE on
